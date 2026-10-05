@@ -1,0 +1,3421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>RJ CM WO Portal</title>
+<style>
+:root{
+  --purple-1:#6C5CE7;
+  --purple-2:#4834D4;
+  --blue-1:#2563EB;
+  --blue-2:#1D4ED8;
+  --bg:#EDEBFB;
+  --card:#FFFFFF;
+  --ink:#1E1B3A;
+  --ink-soft:#6B6884;
+  --line:#E7E4F7;
+  --green:#10B981;
+  --orange:#F59E0B;
+  --pink:#DB2777;
+  --navy:#1E3A5F;
+  --violet:#6D28D9;
+  --teal:#0F766E;
+  --red:#DC2626;
+  --amber:#D97706;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --shadow:0 8px 24px rgba(76,63,168,0.12);
+  font-size:16px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+.hidden{display:none !important;}
+
+/* ---------- Layout shells ---------- */
+.centered-shell{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(108,92,231,0.10), transparent 45%),
+    radial-gradient(circle at 85% 90%, rgba(37,99,235,0.10), transparent 45%),
+    var(--bg);
+}
+.auth-card{
+  width:100%;
+  max-width:460px;
+  background:var(--card);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.auth-head{
+  background:linear-gradient(135deg,var(--blue-1),var(--blue-2));
+  color:#fff;
+  padding:28px 24px;
+  text-align:center;
+}
+.auth-head h1{
+  margin:6px 0 4px;
+  font-size:1.5rem;
+  font-weight:800;
+  letter-spacing:.2px;
+}
+.auth-head p{margin:0;font-size:.85rem;opacity:.9;}
+.auth-body{padding:24px 24px 28px;}
+
+.mode-toggle{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+}
+.mode-btn{
+  flex:1;
+  border:none;
+  border-radius:var(--radius-md);
+  padding:14px 8px;
+  font-weight:800;
+  font-size:.95rem;
+  color:#fff;
+  letter-spacing:.3px;
+  transition:transform .12s ease, box-shadow .12s ease;
+  box-shadow:0 4px 10px rgba(0,0,0,0.12);
+}
+.mode-btn:active{transform:scale(.97);}
+.mode-btn.mode-frt{background:linear-gradient(135deg,#10B981,#0D9488);}
+.mode-btn.mode-others{background:linear-gradient(135deg,#EC4899,#DB2777);}
+.mode-btn.inactive{
+  background:#F1EFFB !important;
+  color:#7A7699;
+  box-shadow:none;
+}
+
+.field{margin-bottom:16px;}
+.field label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:.83rem;
+  font-weight:700;
+  color:#3A3660;
+  margin-bottom:6px;
+}
+.field input, .field select{
+  width:100%;
+  padding:12px 14px;
+  border:1.5px solid var(--line);
+  border-radius:var(--radius-sm);
+  font-size:.95rem;
+  background:#FBFAFF;
+  color:var(--ink);
+  outline:none;
+  transition:border-color .12s;
+}
+.field input:focus, .field select:focus{border-color:var(--blue-1);background:#fff;}
+.pprj-wrap{display:flex;align-items:stretch;}
+.pprj-prefix{
+  background:#EEF2FF;
+  border:1.5px solid var(--line);
+  border-right:none;
+  border-radius:var(--radius-sm) 0 0 var(--radius-sm);
+  padding:0 12px;
+  display:flex;
+  align-items:center;
+  font-weight:800;
+  color:var(--blue-2);
+  font-size:.9rem;
+}
+.pprj-wrap input{border-radius:0 var(--radius-sm) var(--radius-sm) 0;}
+.pw-wrap{position:relative;}
+.pw-wrap button{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  background:none;border:none;font-size:1.1rem;color:#8A87A8;padding:6px;
+}
+.btn-primary{
+  width:100%;
+  border:none;
+  border-radius:var(--radius-sm);
+  padding:14px;
+  font-weight:800;
+  font-size:.98rem;
+  color:#fff;
+  background:linear-gradient(135deg,var(--blue-1),var(--blue-2));
+  box-shadow:0 6px 16px rgba(37,99,235,0.30);
+  margin-top:4px;
+}
+.btn-primary:active{transform:translateY(1px);}
+.btn-ghost{
+  width:100%;
+  border:1.5px solid var(--line);
+  background:#fff;
+  border-radius:var(--radius-sm);
+  padding:12px;
+  font-weight:700;
+  color:#4B4770;
+  margin-top:10px;
+}
+.link-btn{
+  background:none;border:none;color:var(--blue-1);font-weight:700;font-size:.85rem;
+  display:block;margin:14px auto 0;text-align:center;
+}
+.err-msg{
+  background:#FEF2F2;color:#B91C1C;border:1px solid #FCA5A5;
+  border-radius:var(--radius-sm);padding:10px 12px;font-size:.85rem;margin-bottom:14px;
+  font-weight:600;
+}
+
+/* ---------- App shell ---------- */
+#appShell{display:none;min-height:100vh;}
+.topbar{
+  background:linear-gradient(135deg,var(--purple-1),var(--purple-2));
+  color:#fff;
+  padding:16px 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  box-shadow:0 4px 14px rgba(72,52,212,0.25);
+  position:sticky;top:0;z-index:40;
+}
+.topbar-left{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.25rem;}
+.topbar-left .cloud{font-size:1.4rem;}
+.topbar-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.header-back-btn{
+  background:rgba(255,255,255,0.16);color:#fff;border:none;border-radius:999px;
+  padding:9px 16px;font-weight:800;font-size:.82rem;
+}
+.header-reset-btn{
+  background:rgba(255,255,255,0.9);color:#B91C1C;border:none;border-radius:50%;
+  width:42px;height:42px;padding:0;font-size:1.25rem;line-height:42px;text-align:center;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:transform .15s ease;
+}
+.header-reset-btn:active{transform:scale(.92);}
+.header-reset-btn.spinning span{display:inline-block;animation:rjspin .8s linear infinite;}
+@keyframes rjspin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.remember-row{display:flex;align-items:center;gap:8px;margin:-4px 0 14px;font-size:.82rem;font-weight:700;color:#3A3660;cursor:pointer;}
+.remember-row input{width:16px;height:16px;accent-color:#1D4ED8;}
+.user-chip{
+  background:rgba(255,255,255,0.16);
+  border-radius:999px;
+  padding:6px 14px;
+  font-size:.82rem;
+  font-weight:700;
+  text-align:right;
+  line-height:1.25;
+}
+.user-chip small{display:block;font-weight:500;opacity:.85;font-size:.72rem;}
+.logout-btn{
+  background:#fff;color:var(--purple-2);border:none;border-radius:999px;
+  padding:9px 16px;font-weight:800;font-size:.82rem;
+  box-shadow:0 3px 8px rgba(0,0,0,0.15);
+}
+.review-pill{
+  background:linear-gradient(135deg,#F59E0B,#DB2777);
+  color:#fff;border:none;border-radius:999px;padding:9px 16px;
+  font-weight:800;font-size:.82rem;display:flex;align-items:center;gap:6px;
+  box-shadow:0 3px 8px rgba(0,0,0,0.18);
+}
+.review-pill .count{
+  background:#fff;color:#DB2777;border-radius:999px;padding:1px 8px;font-size:.78rem;
+}
+
+.page-wrap{max-width:1180px;margin:0 auto;padding:22px;}
+.section-card{
+  background:var(--card);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow);
+  padding:22px;
+  margin-bottom:20px;
+}
+.section-title{
+  display:flex;align-items:center;gap:10px;
+  font-weight:800;font-size:1.05rem;color:var(--ink);
+  margin:0 0 18px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--line);
+}
+.section-title .dot{width:9px;height:9px;border-radius:50%;background:var(--purple-1);}
+
+.home-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+.add-tt-btn{
+  background:linear-gradient(135deg,#F87171,#EF4444);
+  color:#fff;border:none;border-radius:var(--radius-md);
+  padding:14px 22px;font-weight:800;font-size:.95rem;
+  box-shadow:0 6px 16px rgba(239,68,68,0.28);
+  display:flex;align-items:center;gap:8px;
+}
+
+.filters-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:6px;
+}
+
+table.data-table{width:100%;border-collapse:collapse;font-size:.88rem;}
+table.data-table th{
+  text-align:left;background:#F6F4FE;color:#4B4770;font-weight:800;
+  padding:12px 10px;border-bottom:2px solid var(--line);white-space:nowrap;
+}
+table.data-table td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+table.data-table tr:hover td{background:#FAF9FF;}
+.badge{
+  display:inline-block;padding:4px 10px;border-radius:999px;font-size:.75rem;font-weight:800;
+}
+.badge-fiber{background:#FEE2E2;color:#B91C1C;}
+.badge-patch{background:#FEF3C7;color:#92400E;}
+.badge-sfp{background:#DBEAFE;color:#1E40AF;}
+.badge-other{background:#E5E7EB;color:#374151;}
+.action-btn{
+  background:linear-gradient(135deg,var(--purple-1),var(--purple-2));
+  color:#fff;border:none;padding:8px 16px;border-radius:8px;font-weight:700;font-size:.8rem;
+}
+
+/* clock */
+.clock-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.clock-wrap svg{display:block;}
+.clock-time{font-weight:800;font-size:.78rem;}
+.clock-time.danger{color:var(--red);}
+.clock-time.safe{color:var(--green);}
+.clock-wrap.header-clock{flex-direction:row;gap:8px;align-items:center;}
+.clock-wrap.header-clock .clock-time{font-size:.85rem;}
+
+/* modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(30,27,58,0.55);
+  display:none;align-items:flex-start;justify-content:center;
+  padding:26px 14px;overflow-y:auto;z-index:100;
+}
+.modal-overlay.show{display:flex;}
+.modal-box{
+  background:#fff;border-radius:var(--radius-lg);max-width:960px;width:100%;
+  box-shadow:0 20px 50px rgba(0,0,0,0.3);
+  animation:pop .18s ease;
+}
+@keyframes pop{from{transform:scale(.96);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px;border-bottom:1px solid var(--line);
+}
+.modal-head h3{margin:0;font-size:1.1rem;font-weight:800;}
+.modal-close{background:none;border:none;font-size:1.3rem;color:#8A87A8;}
+.modal-body{padding:20px 22px;}
+.modal-foot{padding:16px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;}
+
+/* ---- Type-to-filter dropdown (Link / Span) ---- */
+.ac-list{
+  position:fixed;z-index:10000;background:#fff;border:1.5px solid #C7D2FE;border-radius:10px;
+  box-shadow:0 12px 28px rgba(30,27,58,0.18);max-height:280px;overflow-y:auto;display:none;
+  font-size:.9rem;
+}
+.ac-list.show{display:block;}
+.ac-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid #F1EFFB;color:#1E1B3A;word-break:break-word;}
+.ac-item:last-child{border-bottom:none;}
+.ac-item:hover,.ac-item.active{background:#EEF2FF;}
+.ac-hl{font-weight:800;color:#2563EB;}
+.ac-note{padding:9px 12px;color:#7A7699;font-size:.8rem;background:#FBFAFF;}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.form-grid .field.full{grid-column:1/-1;}
+
+.tt-prefix-wrap{display:flex;}
+.tt-prefix{
+  background:#F0FDF4;border:1.5px solid var(--line);border-right:none;
+  border-radius:var(--radius-sm) 0 0 var(--radius-sm);
+  padding:0 12px;display:flex;align-items:center;font-weight:800;color:#047857;font-size:.9rem;
+}
+.tt-prefix-wrap input{border-radius:0 var(--radius-sm) var(--radius-sm) 0;}
+
+.btn-secondary{
+  border:1.5px solid var(--line);background:#fff;color:#4B4770;font-weight:700;
+  border-radius:var(--radius-sm);padding:11px 20px;
+}
+.btn-process{
+  border:none;background:linear-gradient(135deg,var(--purple-1),var(--purple-2));color:#fff;
+  font-weight:800;border-radius:var(--radius-sm);padding:11px 24px;
+  box-shadow:0 6px 14px rgba(72,52,212,0.3);
+}
+
+/* detail page */
+.detail-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
+.detail-head-left h2{margin:0 0 4px;font-size:1.3rem;font-weight:800;}
+.repeat-chip{
+  display:inline-block;background:#FFF1F2;color:#BE123C;font-weight:800;font-size:.75rem;
+  padding:3px 10px;border-radius:999px;margin-right:6px;margin-top:4px;
+}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:18px;}
+.info-item{background:#F8F7FE;border-radius:var(--radius-sm);padding:12px 14px;}
+.info-item .lbl{font-size:.72rem;font-weight:800;color:#8A87A8;text-transform:uppercase;letter-spacing:.4px;}
+.info-item .val{font-size:.95rem;font-weight:700;margin-top:3px;color:var(--ink);}
+.gotoloc-btn{
+  background:linear-gradient(135deg,#DC2626,#EA580C);color:#fff;border:none;
+  border-radius:var(--radius-md);padding:13px 24px;font-weight:800;
+  box-shadow:0 6px 16px rgba(220,38,38,0.3);display:flex;align-items:center;gap:8px;
+}
+.gotoloc-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+
+/* photo capture */
+.photo-block{border:1.5px dashed var(--line);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;background:#FBFAFF;}
+.photo-block-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.photo-block-head .lbl{font-weight:800;font-size:.92rem;}
+/* ---- live camera / video modal ---- */
+
+.cam-stage{position:relative;background:#000;border-radius:14px;overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;}
+.cam-stage video{width:100%;height:100%;object-fit:contain;background:#000;}
+.cam-badge{position:absolute;top:12px;left:12px;background:rgba(220,38,38,.92);color:#fff;font-weight:800;padding:6px 12px;border-radius:999px;font-size:.9rem;display:none;}
+.cam-badge.on{display:inline-flex;align-items:center;gap:6px;}
+.cam-badge .dot{width:9px;height:9px;border-radius:50%;background:#fff;animation:rjblink 1s infinite;}
+@keyframes rjblink{50%{opacity:.2;}}
+.cam-msg{color:#fff;text-align:center;padding:20px;font-weight:600;}
+.vid-btn{background:linear-gradient(135deg,#F97316,#EA580C) !important;}
+.cap-group{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.video-thumb{position:relative;width:220px;max-width:100%;border-radius:12px;overflow:hidden;background:#000;border:1px solid var(--line);}
+.video-thumb video, .video-thumb iframe{width:100%;height:150px;display:block;border:0;background:#000;}
+.video-thumb .meta{font-size:.72rem;padding:6px 8px;background:#FBFAFF;color:#4B4770;}
+.video-thumb .rm{position:absolute;top:6px;right:6px;}
+/* ---- CBUD snap: button right under its label ---- */
+.cbud-snap-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:48px;}
+.cbud-snap-row .photo-strip{margin:0;}
+.cbud-snap-row .photo-thumb{width:110px;}
+.field label.cap-btn{color:#fff;margin:0;font-size:.85rem;font-weight:800;gap:6px;cursor:pointer;}
+/* ---- live camera modal ---- */
+.cam-stage{position:relative;background:#000;border-radius:14px;overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;}
+.cam-stage video{width:100%;height:100%;object-fit:contain;background:#000;}
+.cam-badge{position:absolute;top:12px;left:12px;background:rgba(220,38,38,.92);color:#fff;font-weight:800;padding:6px 12px;border-radius:999px;font-size:.95rem;display:none;}
+.cam-badge.on{display:inline-flex;align-items:center;gap:6px;}
+.cam-badge .dot{width:9px;height:9px;border-radius:50%;background:#fff;animation:rjblink 1s infinite;}
+@keyframes rjblink{50%{opacity:.2;}}
+.cam-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:22px;font-weight:600;line-height:1.5;background:rgba(0,0,0,.85);}
+.cam-msg ol{text-align:left;margin:10px 0 0;padding-left:20px;font-weight:500;font-size:.9rem;}
+/* ---- toggle switch (CBUD) ---- */
+.switch-row{display:flex;align-items:center;gap:12px;min-height:48px;}
+.switch{position:relative;width:62px;height:32px;flex:0 0 auto;}
+.switch input{opacity:0;width:0;height:0;}
+.switch .track{position:absolute;inset:0;border-radius:999px;background:#E5E7EB;border:2px solid #CBD5E1;transition:.2s;cursor:pointer;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.08);}
+.switch .track::before{content:'';position:absolute;width:26px;height:26px;left:1px;top:1px;border-radius:50%;
+  background:linear-gradient(180deg,#fff,#E5E7EB);box-shadow:0 2px 5px rgba(0,0,0,.25);transition:.2s;}
+.switch input:checked + .track{background:linear-gradient(180deg,#38BDF8,#0EA5E9);border-color:#7DD3FC;}
+.switch input:checked + .track::before{transform:translateX(30px);}
+.switch-state{font-weight:800;color:#64748B;font-size:.85rem;}
+.cap-btn{
+  background:linear-gradient(135deg,#6D28D9,#4834D4);color:#fff;border:none;border-radius:999px;
+  padding:10px 18px;font-weight:700;font-size:.85rem;display:flex;align-items:center;gap:6px;
+}
+.cap-btn.cap-btn-disabled{
+  background:#D1CFE8;color:#8A87A8;pointer-events:none;cursor:not-allowed;
+}
+.photo-strip{display:flex;gap:10px;flex-wrap:wrap;}
+.photo-thumb{position:relative;width:120px;}
+.photo-thumb img{width:120px;height:90px;object-fit:cover;border-radius:8px;border:1px solid var(--line);}
+.photo-thumb .meta{font-size:.62rem;color:#6B6884;margin-top:3px;line-height:1.25;word-break:break-word;}
+.photo-thumb .rm{
+  position:absolute;top:-6px;right:-6px;background:#DC2626;color:#fff;border:none;
+  border-radius:50%;width:20px;height:20px;font-size:.7rem;line-height:1;
+}
+.note-banner{
+  background:#EFF6FF;border:1px solid #BFDBFE;color:#1E40AF;border-radius:var(--radius-sm);
+  padding:12px 14px;font-size:.87rem;font-weight:600;margin-bottom:16px;
+}
+.delay-block{background:#FFF7ED;border:1px solid #FED7AA;border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;}
+
+/* toast */
+#toastHost{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:400;display:flex;flex-direction:column;gap:10px;align-items:center;}
+.toast{
+  background:#1E1B3A;color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;font-size:.88rem;
+  box-shadow:0 8px 20px rgba(0,0,0,0.3);opacity:0;transform:translateY(10px);transition:all .25s ease;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.err{background:#B91C1C;}
+.toast.ok{background:#065F46;}
+
+.checklist-item{display:flex;align-items:center;gap:8px;font-size:.82rem;color:#4B4770;margin-top:6px;}
+.checklist-item .ok-mark{color:#10B981;font-weight:800;}
+.checklist-item .no-mark{color:#DC2626;font-weight:800;}
+
+.review-card{border:1px solid var(--line);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;background:#FBFAFF;}
+.review-card-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.review-card-head h4{margin:0;font-size:1rem;font-weight:800;}
+
+@media (max-width:720px){
+  .topbar{padding:12px 14px;}
+  .topbar-left{font-size:1.02rem;}
+  .page-wrap{padding:12px;}
+  .section-card{padding:16px;}
+  .detail-head{flex-direction:column;align-items:flex-start;}
+
+  table.data-table thead{display:none;}
+  table.data-table, table.data-table tbody, table.data-table tr, table.data-table td{display:block;width:100%;}
+  table.data-table{white-space:normal;}
+  table.data-table tr{
+    margin-bottom:12px;border:1px solid var(--line);border-radius:12px;padding:6px 10px;background:#FBFAFF;
+  }
+  table.data-table td{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:9px 2px;border-bottom:1px dashed var(--line);text-align:right;
+  }
+  table.data-table td:last-child{border-bottom:none;}
+  table.data-table td::before{
+    content:attr(data-label);font-weight:800;color:#4B4770;font-size:.72rem;
+    text-transform:uppercase;letter-spacing:.3px;text-align:left;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ TOAST HOST ============ -->
+<div id="toastHost"></div>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div class="centered-shell" id="loginScreen">
+  <div class="auth-card">
+    <div class="auth-head">
+      <div style="font-size:1.8rem;">🛠️</div>
+      <h1>RJ CM WO Portal</h1>
+      <p>Fault Restoration &amp; Verification System</p>
+    </div>
+    <div class="auth-body">
+      <div id="loginErr" class="err-msg hidden"></div>
+      <div class="mode-toggle">
+        <button type="button" class="mode-btn mode-frt" id="btnModeFRT" onclick="setLoginMode('FRT')">FRT</button>
+        <button type="button" class="mode-btn mode-others inactive" id="btnModeOthers" onclick="setLoginMode('OTHERS')">Others</button>
+      </div>
+
+      <!-- FRT fields -->
+      <div id="loginFRTFields">
+        <div class="field">
+          <label>🏢 CMP</label>
+          <select id="loginCMP" onchange="populateFRTNames('loginCMP','loginFRTName')"></select>
+        </div>
+        <div class="field">
+          <label>👷 FRT Name</label>
+          <select id="loginFRTName"></select>
+        </div>
+        <div class="field">
+          <label>🔖 PPRJ Code</label>
+          <div class="pprj-wrap">
+            <span class="pprj-prefix">PPRJ</span>
+            <input type="text" id="loginPPRJ" maxlength="8" inputmode="numeric" placeholder="8 digit number"
+              oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Others fields -->
+      <div id="loginOthersFields" class="hidden">
+        <div class="field">
+          <label>👤 User ID</label>
+          <input type="text" id="loginUserId" placeholder="Enter your User ID">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>🔒 Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="loginPassword" placeholder="Enter your Password" autocomplete="current-password" oninput="this.dataset.auto=''">
+          <button type="button" onclick="togglePw('loginPassword',this)">👁️</button>
+        </div>
+      </div>
+      <label class="remember-row"><input type="checkbox" id="rememberPw" checked> Remember Me</label>
+
+      <button class="btn-primary" id="loginBtn" onclick="doLogin()">➡️ Login</button>
+      <button class="link-btn" onclick="goToChangePassword()">🔑 Change Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHANGE PASSWORD SCREEN ============ -->
+<div class="centered-shell hidden" id="cpScreen">
+  <div class="auth-card">
+    <div class="auth-head" style="background:linear-gradient(135deg,var(--purple-1),var(--purple-2));">
+      <div style="font-size:1.8rem;">🔑</div>
+      <h1>Change Password</h1>
+      <p>Update your login credentials</p>
+    </div>
+    <div class="auth-body">
+      <div id="cpErr" class="err-msg hidden"></div>
+      <div class="mode-toggle">
+        <button type="button" class="mode-btn mode-frt" id="btnCpModeFRT" onclick="setCpMode('FRT')">FRT</button>
+        <button type="button" class="mode-btn mode-others inactive" id="btnCpModeOthers" onclick="setCpMode('OTHERS')">Others</button>
+      </div>
+
+      <div id="cpFRTFields">
+        <div class="field">
+          <label>🏢 CMP</label>
+          <select id="cpCMP" onchange="populateFRTNames('cpCMP','cpFRTName')"></select>
+        </div>
+        <div class="field">
+          <label>👷 FRT Name</label>
+          <select id="cpFRTName"></select>
+        </div>
+      </div>
+      <div id="cpOthersFields" class="hidden">
+        <div class="field">
+          <label>👤 User ID</label>
+          <input type="text" id="cpUserId" placeholder="Enter your User ID">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>🔒 Old Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="cpOldPassword" placeholder="Enter Old Password">
+          <button type="button" onclick="togglePw('cpOldPassword',this)">👁️</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>🔒 New Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="cpNewPassword" placeholder="Enter New Password">
+          <button type="button" onclick="togglePw('cpNewPassword',this)">👁️</button>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="cpBtn" onclick="doChangePassword()">💾 Update Password</button>
+      <button class="btn-ghost" onclick="showScreen('login')">⬅️ Back to Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="appShell">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="cloud">☁️</span> RJ CM WO Portal
+      <button class="header-back-btn hidden" id="headerBackBtn" onclick="headerBack()">⬅️ Back</button>
+    </div>
+    <div class="topbar-right">
+      <button class="header-reset-btn" id="headerResetBtn" onclick="headerResetSync()" title="Reset &amp; Sync data with Google Sheet"><span>🔄</span></button>
+      <button class="review-pill" id="reviewPendingBtn" onclick="openReviewList()">
+        📋 Review <span class="count" id="reviewCount">0</span>
+      </button>
+      <div class="user-chip" id="userChip">Name<small>Role</small></div>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <!-- HOME PAGE -->
+    <div id="homePage">
+      <div class="home-toolbar">
+        <div style="font-size:1.15rem;font-weight:800;">🏠 Open Fault Dashboard</div>
+        <button class="add-tt-btn hidden" id="addTTBtn" onclick="openAddTTModal()">➕ Add New TT</button>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title"><span class="dot"></span> Filters</div>
+        <div class="filters-grid">
+          <div class="field" id="filterCMPWrap">
+            <label>🏢 CMP</label>
+            <select id="filterCMP" onchange="onFilterCMPChange('filterCMP','filterFRT'); renderOpenFaults()"><option value="">All</option></select>
+          </div>
+          <div class="field" id="filterFRTWrap">
+            <label>👷 FRT Name</label>
+            <select id="filterFRT" onchange="renderOpenFaults()"><option value="">All</option></select>
+          </div>
+          <div class="field">
+            <label>⚠️ Fault Type</label>
+            <select id="filterFaultType" onchange="renderOpenFaults()"><option value="">All</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title"><span class="dot"></span> Open Fault List</div>
+        <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead><tr>
+            <th>TT No.</th><th>Fault Type</th><th>Affected Service</th><th>Anti Clock</th><th>Action</th>
+          </tr></thead>
+          <tbody id="openFaultTbody"></tbody>
+        </table>
+        </div>
+        <div id="noFaultsMsg" class="hidden" style="text-align:center;color:#9C99B8;padding:26px;font-weight:600;">No open faults 🎉</div>
+      </div>
+    </div>
+
+    <!-- FAULT DETAIL PAGE -->
+    <div id="detailPage" class="hidden">
+      <div class="section-card">
+        <div class="detail-head">
+          <div class="detail-head-left">
+            <h2 id="detailTTNo">TT No.</h2>
+            <div id="detailRepeatChips"></div>
+          </div>
+          <div class="clock-wrap" id="detailClockWrap"></div>
+        </div>
+        <div class="info-grid" id="detailInfoGrid"></div>
+        <div class="field" style="max-width:320px;">
+          <label>⚠️ Fault Type</label>
+          <select id="detailFaultTypeSel"></select>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;">
+          <button class="btn-secondary" id="detailUpdateBtn" onclick="updateFaultTypeOnDetail()">🔄 Update</button>
+          <button class="gotoloc-btn" id="gotoLocBtn" onclick="openGoToLocation()">📍 Go To Fault Location</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GO TO LOCATION PAGE (FRT) -->
+    <div id="locPage" class="hidden">
+      <!-- FIBER CUT / PATCH CHORD FLOW (FRT) -->
+      <div class="section-card" id="fiberPatchCard">
+        <div class="detail-head">
+          <div class="detail-head-left"><h2 id="locTTNo">TT No.</h2></div>
+          <div class="clock-wrap" id="locClockWrap"></div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item"><div class="lbl">PPRJ Code</div><div class="val" id="locPPRJ">-</div></div>
+          <div class="info-item"><div class="lbl">Person Name</div><div class="val" id="locPersonName">-</div></div>
+          <div class="info-item"><div class="lbl">Job Role</div><div class="val" id="locJobRole">-</div></div>
+        </div>
+
+        <div class="photo-block">
+          <div class="photo-block-head">
+            <span class="lbl">📷 Pre Photo / 🎥 Pre Video (Live capture)</span>
+            <div class="cap-group">
+              <label class="cap-btn" style="display:inline-flex;">📸 Capture Photo
+                <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleCaptureInput(event,'pre')">
+              </label>
+              <button type="button" class="cap-btn vid-btn" onclick="startVideo('preVideo')">🎥 Pre Video (20s)</button>
+            </div>
+          </div>
+          <div class="photo-strip" id="prePhotoStrip"></div>
+          <div class="photo-strip" id="preVideoStrip"></div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item"><div class="lbl">Travel Time</div><div class="val" id="travelTimeVal">--:--:--</div></div>
+        </div>
+
+        <div class="note-banner">ℹ️ Fault Restore hone ke baad Post Photo Capture kare</div>
+
+        <div class="photo-block">
+          <div class="photo-block-head">
+            <span class="lbl">📷 Post Photo / 🎥 Post Video (Live capture)</span>
+            <div class="cap-group">
+              <label class="cap-btn" style="display:inline-flex;">📸 Capture Photo
+                <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleCaptureInput(event,'post')">
+              </label>
+              <button type="button" class="cap-btn vid-btn" onclick="startVideo('postVideo')">🎥 Post Video (20s)</button>
+            </div>
+          </div>
+          <div class="photo-strip" id="postPhotoStrip"></div>
+          <div class="photo-strip" id="postVideoStrip"></div>
+        </div>
+
+        <!-- Patch Chord only fields -->
+        <div id="patchOnlyFieldsBlock" class="hidden">
+          <div class="form-grid">
+            <div class="field">
+              <label>📍 Site ID</label>
+              <input type="text" id="pcSiteId" placeholder="Type to search Site ID" autocomplete="off" oninput="saveDraft()">
+              <datalist id="siteIdOptions"></datalist>
+            </div>
+            <div class="field">
+              <label>🏗️ Site Type</label>
+              <select id="pcSiteType" onchange="onSiteTypeChange()">
+                <option value="">Select</option>
+                <option>GBM</option><option>RTT / RTP</option><option>GBT</option><option>NBT</option>
+                <option>COW</option><option>IBS</option><option>Standalone</option><option>MW Repeater</option><option>ILA</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>⚠️ PC Fault Type</label>
+              <select id="pcFaultTypeSel" onchange="saveDraft()">
+                <option value="">Select</option>
+                <option>Rat Bite</option><option>Squirrel Bite</option><option>High Power</option>
+                <option>Distrub by Other</option><option>Door Alignment</option><option>Connector Issue</option><option>Pigtail Damage</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field" id="ownershipFieldWrap">
+            <label>🏷️ Ownership</label>
+            <select id="ownershipSel" onchange="saveDraft()"><option value="">Select</option><option>Own</option><option>Rcom</option><option>Other</option></select>
+          </div>
+          <div class="field" id="faultType3FieldWrap">
+            <label>⚠️ Fault Type</label>
+            <select id="faultType3Sel" onchange="saveDraft()">
+              <option value="">Select</option>
+              <option>Cable Cut - Excavation</option>
+              <option>Cable Cut - Rodent</option>
+              <option>Connector Loss</option>
+              <option>Patch Chord Fault</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field" id="cbudToggleWrap">
+            <label>🧾 CBUD Entry (if Applicable)</label>
+            <div class="switch-row">
+              <label class="switch"><input type="checkbox" id="cbudToggle" onchange="onCbudToggle()"><span class="track"></span></label>
+              <span class="switch-state" id="cbudState">No</span>
+            </div>
+          </div>
+          <div class="field hidden" id="cbudNoWrap">
+            <label>🔢 CBUD Portal Entry No.</label>
+            <input type="text" id="cbudNo" placeholder="Enter CBUD Portal Entry No." oninput="saveDraft()">
+          </div>
+          <div class="field hidden" id="cbudSnapWrap">
+            <label>🖼️ CBUD Snap</label>
+            <div class="cbud-snap-row">
+              <label class="cap-btn" style="display:inline-flex;">📤 Upload Snap
+                <input type="file" accept="image/*" style="display:none;" onchange="uploadCbudSnap(event)">
+              </label>
+              <div class="photo-strip" id="cbudSnapStrip"></div>
+            </div>
+          </div>
+          <div class="field full">
+            <label>📝 Details / RCA</label>
+            <textarea id="rcaDetails" rows="3" style="width:100%;padding:12px;border:1.5px solid var(--line);border-radius:10px;" oninput="saveDraft()" placeholder="Root cause / remarks"></textarea>
+          </div>
+          <div class="field">
+            <label>⏱️ Fault Restore Time</label>
+            <input type="text" id="restoreTimeVal" readonly value="--:--">
+          </div>
+          <div class="field" id="restorationType1Wrap">
+            <label>🔩 Restoration Type 1</label>
+            <select id="restorationType1Sel" onchange="saveDraft()">
+              <option value="">Select</option>
+              <option>Single Joint</option>
+              <option>Double Joint</option>
+              <option>Re-spliced</option>
+            </select>
+          </div>
+          <div class="field" id="restorationTypeWrap">
+            <label>🔧 Restoration Type 2</label>
+            <select id="restorationTypeSel" onchange="onRestorationTypeChange()">
+              <option value="">Select</option>
+              <option>Temporary</option>
+              <option>Permanent</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="delay-block hidden" id="delayReasonBlock">
+          <div class="field" style="margin-bottom:0;">
+            <label>⏰ Delay Reason (mandatory, restore time ≥ 4 hrs)</label>
+            <textarea id="delayReason" rows="2" style="width:100%;padding:12px;border:1.5px solid var(--line);border-radius:10px;" oninput="saveDraft()"></textarea>
+          </div>
+        </div>
+
+        <!-- Fiber Cut — Temporary -->
+        <div id="tempFieldsBlockFiber" class="hidden">
+          <div class="section-title" style="margin-top:6px;"><span class="dot"></span> Temporary Restoration Details</div>
+          <div class="form-grid">
+            <div class="field"><label>T&amp;D (meter)</label><input type="text" id="fldTD" inputmode="numeric" oninput="numericOnly(this)"></div>
+            <div class="field"><label>A2UG (meter)</label><input type="text" id="fldA2UG" inputmode="numeric" oninput="numericOnly(this)"></div>
+            <div class="field"><label>JC Rehab (nos)</label><input type="text" id="fldJC" inputmode="numeric" oninput="numericOnly(this)"></div>
+            <div class="field"><label>Aerial Rehab (meter)</label><input type="text" id="fldAerial" inputmode="numeric" oninput="numericOnly(this)"></div>
+            <div class="field"><label>PCC (meter)</label><input type="text" id="fldPCC" inputmode="numeric" oninput="numericOnly(this)"></div>
+            <div class="field"><label>MH Installation (nos)</label><input type="text" id="fldMH" inputmode="numeric" oninput="numericOnly(this)"></div>
+            <div class="field"><label>Safeguarding (meter)</label><input type="text" id="fldSafeguard" inputmode="numeric" oninput="numericOnly(this)"></div>
+            <div class="field"><label>Tray Remove (nos)</label><input type="text" id="fldTrayRemove" inputmode="numeric" oninput="numericOnly(this)"></div>
+          </div>
+        </div>
+
+        <!-- Fiber Cut — Permanent -->
+        <div id="permFieldsBlockFiber" class="hidden">
+          <div class="section-title" style="margin-top:6px;"><span class="dot"></span> Permanent Restoration Photos</div>
+          <div class="photo-block">
+            <div class="photo-block-head"><span class="lbl">🗃️ Tray Photo</span>
+              <label class="cap-btn" style="display:inline-flex;">📸 Capture
+                <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleCaptureInput(event,'tray')">
+              </label>
+            </div>
+            <div class="photo-strip" id="trayPhotoStrip"></div>
+          </div>
+          <div class="photo-block">
+            <div class="photo-block-head"><span class="lbl">🛢️ JC Photo</span>
+              <label class="cap-btn" style="display:inline-flex;">📸 Capture
+                <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleCaptureInput(event,'jc')">
+              </label>
+            </div>
+            <div class="photo-strip" id="jcPhotoStrip"></div>
+          </div>
+          <div class="photo-block">
+            <div class="photo-block-head"><span class="lbl">🕳️ MH Photo</span>
+              <label class="cap-btn" style="display:inline-flex;">📸 Capture
+                <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleCaptureInput(event,'mh')">
+              </label>
+            </div>
+            <div class="photo-strip" id="mhPhotoStrip"></div>
+          </div>
+        </div>
+
+        <!-- Patch Chord — Temporary -->
+        <div id="tempFieldsBlockPatch" class="hidden">
+          <div class="section-title" style="margin-top:6px;"><span class="dot"></span> Temporary Restoration Details</div>
+          <div class="form-grid">
+            <div class="field"><label>Roxtec Sealing</label><select id="pcRoxtec" onchange="saveDraft()"><option value="">Select</option><option>Required</option><option>Not Required</option></select></div>
+            <div class="field"><label>Door Alignment</label><select id="pcDoorAlign" onchange="saveDraft()"><option value="">Select</option><option>Ok</option><option>Damage</option></select></div>
+            <div class="field"><label>PC Rooting</label><select id="pcRooting" onchange="saveDraft()"><option value="">Select</option><option>Re-Rooting Required</option><option>Ok</option></select></div>
+            <div class="field"><label>PC Condition</label><select id="pcCondition" onchange="saveDraft()"><option value="">Select</option><option>Ok</option><option>Replacement Required</option></select></div>
+            <div class="field hidden" id="pcBottomPCCWrap"><label>Bottom PCC</label><select id="pcBottomPCC" onchange="saveDraft()"><option value="">Select</option><option>PCC Required</option><option>Ok</option></select></div>
+            <div class="field"><label>FDMS Sealing</label><select id="pcFdmsSealing" onchange="saveDraft()"><option value="">Select</option><option>Ok</option><option>Not Ok</option><option>Replace Required</option></select></div>
+          </div>
+        </div>
+
+        <!-- Patch Chord — Permanent -->
+        <div id="permFieldsBlockPatch" class="hidden">
+          <div class="section-title" style="margin-top:6px;"><span class="dot"></span> Permanent Restoration Photos</div>
+          <div class="photo-block">
+            <div class="photo-block-head"><span class="lbl">🧭 PC Rooting Photo</span>
+              <label class="cap-btn" style="display:inline-flex;">📸 Capture
+                <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleCaptureInput(event,'pcrouting')">
+              </label>
+            </div>
+            <div class="photo-strip" id="pcRoutingPhotoStrip"></div>
+          </div>
+          <div class="photo-block">
+            <div class="photo-block-head"><span class="lbl">🔻 Cable Entry Photo</span>
+              <label class="cap-btn" style="display:inline-flex;">📸 Capture
+                <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleCaptureInput(event,'cableentry')">
+              </label>
+            </div>
+            <div class="photo-strip" id="cableEntryPhotoStrip"></div>
+          </div>
+          <div class="photo-block">
+            <div class="photo-block-head"><span class="lbl">🗄️ FDMS Photo</span>
+              <label class="cap-btn" style="display:inline-flex;">📸 Capture
+                <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleCaptureInput(event,'fdms')">
+              </label>
+            </div>
+            <div class="photo-strip" id="fdmsPhotoStrip"></div>
+          </div>
+          <div class="photo-block hidden" id="bottomPccPhotoBlock">
+            <div class="photo-block-head"><span class="lbl">🧱 Bottom PCC Photo</span>
+              <label class="cap-btn" style="display:inline-flex;">📸 Capture
+                <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleCaptureInput(event,'bottompcc')">
+              </label>
+            </div>
+            <div class="photo-strip" id="bottomPccPhotoStrip"></div>
+          </div>
+        </div>
+
+        <!-- Shared JPW upload -- appears for both Temporary & Permanent, both Fiber Cut & Patch Chord -->
+        <div class="photo-block hidden" id="jpwBlock">
+          <div class="photo-block-head">
+            <span class="lbl">📄 TT01 WO Closed in JPW Snap</span>
+            <label class="cap-btn" style="display:inline-flex;">📤 Upload
+              <input type="file" accept="image/*" style="display:none;" onchange="uploadJPW(event)">
+            </label>
+          </div>
+          <div class="photo-strip" id="jpwPhotoStrip"></div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <div class="checklist-item" id="chkPre"></div>
+          <div class="checklist-item" id="chkPost"></div>
+          <div class="checklist-item" id="chkRestType"></div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-top:18px;">
+          <button class="btn-process" id="submitLocBtn" onclick="submitFaultForReview()">✅ Submit</button>
+        </div>
+      </div>
+
+      <!-- SFP ISSUE FLOW (NOC only) -->
+      <div class="section-card hidden" id="sfpCard">
+        <div class="detail-head">
+          <div class="detail-head-left"><h2 id="sfpTTNo">TT No.</h2></div>
+          <div class="clock-wrap" id="sfpClockWrap"></div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item"><div class="lbl">Fault Type</div><div class="val">SFP Issue</div></div>
+        </div>
+        <div class="field" style="max-width:360px;">
+          <label>📡 SFP Issue Status</label>
+          <select id="sfpStatusSel">
+            <option value="">Select</option>
+            <option>SFP Issue Closed Confirm by Engineer</option>
+            <option>Pending</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:18px;">
+          <button class="btn-process" onclick="closeSfpIssue()">✅ Closed TT</button>
+        </div>
+      </div>
+
+      <!-- OTHERS FLOW (NOC / Engineer / Admin) -->
+      <div class="section-card hidden" id="othersCard">
+        <div class="detail-head">
+          <div class="detail-head-left"><h2 id="othersTTNo">TT No.</h2></div>
+          <div class="clock-wrap" id="othersClockWrap"></div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item"><div class="lbl">Fault Type</div><div class="val">Others</div></div>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label>📂 Other Category</label>
+            <select id="otherCategorySel" onchange="onOtherCategoryChange()">
+              <option value="">Select</option>
+              <option>Transport TT</option>
+              <option>Associate TT</option>
+              <option>Under PE</option>
+              <option value="Auto Restored" id="otherCatAutoRestoredOpt">Auto Restored</option>
+            </select>
+          </div>
+          <div class="field hidden" id="so6Wrap">
+            <label>🔢 SO6 No.</label>
+            <input type="text" id="so6No" maxlength="10" inputmode="numeric" placeholder="10 digit number"
+              oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
+          </div>
+          <div class="field hidden" id="parentTTWrap">
+            <label>🔗 Parent TT</label>
+            <div class="tt-prefix-wrap"><span class="tt-prefix">IM</span>
+              <input type="text" id="parentTT" maxlength="9" inputmode="numeric" placeholder="9 digit number"
+                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)">
+            </div>
+          </div>
+          <div class="field hidden" id="peNoWrap">
+            <label>🔢 PE No.</label>
+            <div class="tt-prefix-wrap"><span class="tt-prefix">C</span>
+              <input type="text" id="peNo" maxlength="7" inputmode="numeric" placeholder="7 digit number"
+                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,7)">
+            </div>
+          </div>
+          <div class="field full hidden" id="autoRestoredWrap">
+            <label>📝 Auto Restored RCA</label>
+            <textarea id="autoRestoredRCA" rows="3" maxlength="150" style="width:100%;padding:12px;border:1.5px solid var(--line);border-radius:10px;" placeholder="Max 150 characters"></textarea>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:18px;">
+          <button class="btn-process" onclick="closeOthersTT()">✅ Closed TT</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVIEW LIST PAGE (Engineer) -->
+    <div id="reviewListPage" class="hidden">
+      <div class="section-card">
+        <div class="section-title"><span class="dot"></span> Review Pending — Filters</div>
+        <div class="filters-grid">
+          <div class="field"><label>📅 From Date</label><input type="date" id="rvFromDate" onchange="renderReviewList()"></div>
+          <div class="field"><label>📅 To Date</label><input type="date" id="rvToDate" onchange="renderReviewList()"></div>
+          <div class="field"><label>🌐 Domain</label>
+            <select id="rvDomain" onchange="renderReviewList()"><option value="">All</option><option>Transport</option><option>Access</option></select>
+          </div>
+          <div class="field"><label>🏢 CMP</label><select id="rvCMP" onchange="onFilterCMPChange('rvCMP','rvFRT'); renderReviewList()"><option value="">All</option></select></div>
+          <div class="field"><label>👷 FRT Name</label><select id="rvFRT" onchange="renderReviewList()"><option value="">All</option></select></div>
+          <div class="field"><label>⚠️ Fault Type</label><select id="rvFaultType" onchange="renderReviewList()"><option value="">All</option></select></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+          <button class="btn-process" onclick="renderReviewList()">🔍 Search</button>
+        </div>
+      </div>
+      <div id="reviewListHost"></div>
+      <div id="noReviewMsg" class="hidden section-card" style="text-align:center;color:#9C99B8;font-weight:600;">No entries pending review 🎉</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADD NEW TT MODAL ============ -->
+<div class="modal-overlay" id="addTTModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>➕ Add New TT</h3>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="clock-wrap header-clock" id="newTTClockWrap"></div>
+        <button class="modal-close" onclick="closeAddTTModal()">✕</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field">
+          <label>🏢 CMP</label>
+          <select id="newCMP" onchange="onNewCMPChange()"></select>
+        </div>
+        <div class="field">
+          <label>🔢 TT No.</label>
+          <div class="tt-prefix-wrap">
+            <span class="tt-prefix">IM</span>
+            <input type="text" id="newTTNo" maxlength="9" inputmode="numeric" placeholder="9 digit number"
+              oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)">
+          </div>
+        </div>
+        <div class="field">
+          <label>🔗 Link Name</label>
+          <input type="text" id="newLinkName" placeholder="Type to search Link" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>📶 Span Name</label>
+          <input type="text" id="newSpanName" placeholder="Type to search Span" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>🛰️ Affected Service</label>
+          <select id="newAffectedService"><option value="">Select Affected Service</option></select>
+        </div>
+        <div class="field">
+          <label>📅 TT Open Date</label>
+          <input type="date" id="newOpenDate">
+        </div>
+        <div class="field">
+          <label>⏰ TT Open Time</label>
+          <input type="time" id="newOpenTime" step="1">
+        </div>
+        <div class="field">
+          <label>👷 Fiber Engineer Name</label>
+          <select id="newEngineer"></select>
+        </div>
+        <div class="field">
+          <label>🧑‍💼 Supervisor Name</label>
+          <select id="newSupervisor" onchange="onNewSupervisorChange()"></select>
+        </div>
+        <div class="field">
+          <label>🚒 FRT Name</label>
+          <select id="newFRTName"></select>
+        </div>
+        <div class="field">
+          <label>⚠️ Fault Type</label>
+          <select id="newFaultType">
+            <option value="">Select</option>
+            <option>Fiber Cut</option>
+            <option>Patch Chord</option>
+            <option>SFP Issue</option>
+            <option>Others</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>🔢 WO No.</label>
+          <input type="text" id="newWONo" maxlength="12" inputmode="numeric" placeholder="12 digit number"
+            oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,12)">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeAddTTModal()">Cancel</button>
+      <button class="btn-process" id="processTTBtn" onclick="processNewTT()">⚙️ Process</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ REVIEW DETAIL MODAL ============ -->
+<div class="modal-overlay" id="reviewDetailModal">
+  <div class="modal-box" style="max-width:760px;">
+    <div class="modal-head"><h3 id="rdTTNo">Review Entry</h3><button class="modal-close" onclick="closeReviewDetail()">✕</button></div>
+    <div class="modal-body" id="reviewDetailBody"></div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeReviewDetail()">Close</button>
+      <button class="btn-process" id="reviewSubmitBtn" onclick="submitReviewConfirm()">✅ Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LIVE CAMERA / VIDEO (GitHub Pages) ============ -->
+<div class="modal-overlay" id="camModal">
+  <div class="modal-box" style="max-width:720px;">
+    <div class="modal-head"><h3 id="camTitle">📷 Camera</h3><button class="modal-close" onclick="closeCamera()">✕</button></div>
+    <div class="modal-body">
+      <div class="cam-stage">
+        <video id="camVideo" autoplay playsinline muted></video>
+        <div class="cam-badge" id="camBadge"><span class="dot"></span><span id="camBadgeTxt">REC 20</span></div>
+        <div class="cam-msg hidden" id="camMsg"></div>
+      </div>
+    </div>
+    <div class="modal-foot" style="flex-wrap:wrap;">
+      <button class="btn-secondary" id="camSwitchBtn" onclick="switchCamera()">🔄 Switch Camera</button>
+      <button class="btn-secondary hidden" id="camRetryBtn" onclick="retryCamera()">🔓 Allow Camera &amp; Retry</button>
+      <button class="btn-secondary" onclick="closeCamera()">Cancel</button>
+      <button class="btn-process" id="camShotBtn" onclick="takeCameraPhoto()">📸 Capture</button>
+      <button class="btn-process hidden" id="camStopBtn" onclick="stopVideoRecording()">⏹ Stop</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="videoCaptureInput" accept="video/*" capture="environment" style="display:none;" onchange="handleVideoInput(event)">
+<canvas id="camCanvas" style="display:none;"></canvas>
+
+<script>
+/* ================= REFERENCE DATA (loaded live from Google Sheet) =================
+   REF is filled by getReferenceData() in Code.gs:
+   - CMP / FRT list            -> "User" sheet Column K (CMP Name List) + Column L (FRT Name List)
+   - Engineers / Supervisors   -> "User" sheet (Job Role = Engineer / Supervisor)
+   - Link / Span / Site ID     -> "Support" sheet
+   Passwords are NEVER sent to the browser; login is checked on the server. */
+let REF = { cmpList:[], frtCmpList:[], frtByCmp:{}, engineers:[], supervisors:[], links:[], sites:[] };
+const FAULT_TYPES = ["Fiber Cut","Patch Chord","SFP Issue","Others"];
+
+/* ================= STATE / STORAGE HELPERS ================= */
+const LS = {
+  session:"rjcmwo_session",
+  openFaults:"rjcmwo_openFaults",
+  reviewQueue:"rjcmwo_reviewQueue",
+  draftPrefix:"rjcmwo_draft_",
+  dataVersion:"rjcmwo_dataVersion"
+};
+function lsGet(key, fallback){
+  try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; }
+}
+function lsSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+function pad2_(n){ return String(n).padStart(2,'0'); }
+function localDateInputValue(d){ return d.getFullYear()+'-'+pad2_(d.getMonth()+1)+'-'+pad2_(d.getDate()); }
+function localTimeInputValue(d){ return pad2_(d.getHours())+':'+pad2_(d.getMinutes())+':'+pad2_(d.getSeconds()); }
+function isMobileDevice(){
+  return /Android|iPhone|iPad|iPod|Mobile|Windows Phone|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+/* One-time cleanup: remove old demo users' session + demo faults / demo review entries
+   saved in this browser by the earlier demo version. */
+const DATA_VERSION = 'sheet-login-v1';
+if(lsGet(LS.dataVersion, '') !== DATA_VERSION){
+  try{
+    Object.keys(localStorage).forEach(k=>{ if(k.indexOf('rjcmwo_')===0) localStorage.removeItem(k); });
+  }catch(e){}
+  lsSet(LS.dataVersion, DATA_VERSION);
+}
+
+let session = lsGet(LS.session, null);
+/* TT data now lives in the "Verification" Google Sheet.
+   localStorage keeps only a CACHE (instant display) — refreshed from the sheet. */
+const LS_TT = 'rjcmwo_ttCache';
+const LS_MIGRATED = 'rjcmwo_migratedV1';
+const ttCache = lsGet(LS_TT, null);
+let openFaults = (ttCache && ttCache.faults) || [];
+let reviewQueue = (ttCache && ttCache.reviews) || [];
+function saveTTCache(){ lsSet(LS_TT, { faults: openFaults, reviews: reviewQueue, savedAt: Date.now() }); }
+let currentDetailTT = null;   // TT object currently viewed
+let currentDraftKey = null;   // localStorage key for in-progress FRT field form
+let newTTClockTimer = null, detailClockTimer = null, locClockTimer = null;
+
+/* ================= SERVER CALL HELPER =================
+   Same file works in 2 places:
+   1) Apps Script web app  -> google.script.run
+   2) GitHub Pages (index.html) -> fetch() to the Apps Script /exec URL (doPost API in Code.gs)
+   On GitHub Pages the in-page LIVE CAMERA works (Apps Script blocks camera inside its frame). */
+const API_URL = 'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE';   // e.g. https://script.google.com/macros/s/AKfy..../exec
+const IN_APPS_SCRIPT = !!(window.google && google.script && google.script.run);
+function callServer(fnName, arg){
+  if(IN_APPS_SCRIPT){
+    return new Promise((resolve, reject)=>{
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(err=> reject(err instanceof Error ? err : new Error(String(err))))[fnName](arg);
+    });
+  }
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(API_URL)){
+    return Promise.reject(new Error('Index.html me API_URL (Apps Script /exec link) set karein.'));
+  }
+  return fetch(API_URL, {
+    method:'POST', redirect:'follow',
+    headers:{ 'Content-Type':'text/plain;charset=utf-8' },          // simple request -> no CORS preflight
+    body: JSON.stringify({ fn: fnName, arg: arg === undefined ? null : arg })
+  }).then(r=> r.json()).then(j=>{
+    if(j && j.__error) throw new Error(j.__error);
+    return j ? j.result : null;
+  });
+}
+/* ================= LOCAL CACHE (instant UI) =================
+   - REF (dropdown data) cached in localStorage -> page shows instantly,
+     fresh data from Sheet is loaded silently in background.
+   - Login credentials cached per user (password stored as SHA-256 hash,
+     not plain text) with that user's access -> next login is instant,
+     then verified with Sheet in background. */
+const LS_REF = 'rjcmwo_ref';
+const LS_CREDS = 'rjcmwo_creds';
+const LS_LAST = 'rjcmwo_lastLogin';
+let refLoadedOnce = false;
+async function hashPw(key, pw){
+  const text = 'rjcmwo|' + key + '|' + pw;
+  try{
+    if(window.crypto && crypto.subtle && window.TextEncoder){
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+  }catch(e){}
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;           // fallback hash
+  for(let i=0;i<text.length;i++){ const c=text.charCodeAt(i); h1=Math.imul(h1^c,2654435761); h2=Math.imul(h2^c,1597334677); }
+  h1 = Math.imul(h1^(h1>>>16),2246822507) ^ Math.imul(h2^(h2>>>13),3266489909);
+  h2 = Math.imul(h2^(h2>>>16),2246822507) ^ Math.imul(h1^(h1>>>13),3266489909);
+  return 'f' + (h2>>>0).toString(16) + (h1>>>0).toString(16);
+}
+function credKey(p){
+  return p.mode === 'FRT'
+    ? 'FRT|' + String(p.cmp||'').trim().toLowerCase() + '|' + String(p.frt||'').trim().toLowerCase()
+    : 'OT|' + String(p.userId||'').trim().toUpperCase();
+}
+function getCreds(){ return lsGet(LS_CREDS, {}) || {}; }
+function saveCred(key, hash, sess){
+  const c = getCreds(); c[key] = { hash, session: sess, savedAt: Date.now() }; lsSet(LS_CREDS, c);
+}
+function removeCred(key){ const c = getCreds(); delete c[key]; lsSet(LS_CREDS, c); }
+
+/* ---- Remember password (auto-fill on login screen) ---- */
+const LS_SAVEDPW = 'rjcmwo_savedPw';
+function encPw_(pw){ try{ return btoa(unescape(encodeURIComponent(pw))).split('').reverse().join(''); }catch(e){ return ''; } }
+function decPw_(v){ try{ return decodeURIComponent(escape(atob(String(v).split('').reverse().join('')))); }catch(e){ return ''; } }
+function savePw(key, pw){ const m = lsGet(LS_SAVEDPW, {}) || {}; m[key] = encPw_(pw); lsSet(LS_SAVEDPW, m); }
+function getSavedPw(key){ const m = lsGet(LS_SAVEDPW, {}) || {}; return m[key] ? decPw_(m[key]) : ''; }
+function removeSavedPw(key){ const m = lsGet(LS_SAVEDPW, {}) || {}; delete m[key]; lsSet(LS_SAVEDPW, m); }
+function currentLoginKey(){
+  return loginMode === 'FRT'
+    ? credKey({ mode:'FRT', cmp:document.getElementById('loginCMP').value, frt:document.getElementById('loginFRTName').value })
+    : credKey({ mode:'OTHERS', userId:document.getElementById('loginUserId').value });
+}
+/* Fill password box from saved password for the selected CMP+FRT / User ID */
+function fillSavedPassword(){
+  const pwEl = document.getElementById('loginPassword');
+  if(pwEl.value && pwEl.dataset.auto !== '1') return;      // user typed something -> don't overwrite
+  const saved = getSavedPw(currentLoginKey());
+  pwEl.value = saved || '';
+  pwEl.dataset.auto = saved ? '1' : '';
+}
+
+/* ================= GENERIC UI HELPERS ================= */
+function toast(msg, type){
+  const host = document.getElementById('toastHost');
+  const el = document.createElement('div');
+  el.className = 'toast' + (type?(' '+type):'');
+  el.textContent = msg;
+  host.appendChild(el);
+  requestAnimationFrame(()=> el.classList.add('show'));
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),300); }, 3200);
+}
+function togglePw(id, btn){
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+function numericOnly(el){ el.value = el.value.replace(/[^0-9]/g,''); saveDraft(); }
+function showScreen(name){
+  document.getElementById('loginScreen').classList.toggle('hidden', name!=='login');
+  document.getElementById('cpScreen').classList.toggle('hidden', name!=='cp');
+  document.getElementById('appShell').style.display = name==='app' ? 'block' : 'none';
+}
+function fillSelect(sel, options, placeholder){
+  sel.innerHTML = '';
+  if(placeholder){ const o=document.createElement('option'); o.value=''; o.textContent=placeholder; sel.appendChild(o); }
+  options.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
+}
+function populateFRTNames(cmpId, frtId, placeholder){
+  const cmp = document.getElementById(cmpId).value;
+  const frtSel = document.getElementById(frtId);
+  const list = (REF.frtByCmp[cmp] || []);
+  fillSelect(frtSel, list, list.length ? (placeholder || 'Select FRT') : 'No FRT found for this CMP');
+}
+/* FRT names of one CMP (User sheet Column K/L). No CMP -> all FRTs. */
+function frtNamesForCmp(cmp){
+  if(!cmp) return allFRTNames();
+  const key = Object.keys(REF.frtByCmp).find(k=> k.toLowerCase() === String(cmp).toLowerCase());
+  return key ? REF.frtByCmp[key].slice() : [];
+}
+/* Filter section: CMP change -> FRT Name list of that CMP only (keeps FRT if still valid) */
+function onFilterCMPChange(cmpId, frtId){
+  const cmp = document.getElementById(cmpId).value;
+  keepVal(frtId, ()=> fillSelect(document.getElementById(frtId), frtNamesForCmp(cmp), 'All'));
+}
+function allFRTNames(){
+  const set = {};
+  Object.values(REF.frtByCmp).forEach(arr=> arr.forEach(n=> set[n]=true));
+  return Object.keys(set).sort();
+}
+function fillDatalist(id, values){
+  const dl = document.getElementById(id);
+  dl.innerHTML = '';
+  values.forEach(v=>{ const o=document.createElement('option'); o.value=v; dl.appendChild(o); });
+}
+function uniq_(arr){ return Array.from(new Set(arr.filter(Boolean))); }
+function cmpMatch_(cmpArr, cmp){
+  if(!cmp) return true;
+  return (cmpArr||[]).some(c=> c.toLowerCase()==='all' || c.toLowerCase()===cmp.toLowerCase());
+}
+/* Add New TT: CMP change -> FRT, Engineer, Supervisor, Link list for that CMP */
+function onNewCMPChange(){
+  const cmp = document.getElementById('newCMP').value;
+  populateFRTNames('newCMP','newFRTName');
+  let engs = REF.engineers.filter(e=> cmpMatch_(e.cmps, cmp)).map(e=>e.label);
+  let sups = REF.supervisors.filter(e=> cmpMatch_(e.cmps, cmp)).map(e=>e.label);
+  if(!engs.length) engs = REF.engineers.map(e=>e.label);
+  if(!sups.length) sups = REF.supervisors.map(e=>e.label);
+  fillSelect(document.getElementById('newEngineer'), uniq_(engs), 'Select Engineer');
+  fillSelect(document.getElementById('newSupervisor'), uniq_(sups), sups.length ? 'Select Supervisor' : 'No Supervisor in User sheet');
+}
+/* Supervisor change -> FRT Name list = that Supervisor's "FRT Access" (User sheet, comma separated).
+   No supervisor selected (or FRT Access = All/blank) -> FRT list of selected CMP (Column K/L). */
+function normFrt_(v){ return String(v||'').replace(/\s+/g,' ').trim().toLowerCase(); }
+function onNewSupervisorChange(){
+  const supLabel = document.getElementById('newSupervisor').value;
+  const sup = REF.supervisors.find(x=> x.label === supLabel);
+  const frtSel = document.getElementById('newFRTName');
+  const access = sup ? (sup.frts||[]).filter(f=> f && f.toLowerCase() !== 'all') : [];
+  if(!sup || !access.length){
+    populateFRTNames('newCMP','newFRTName');
+  } else {
+    // use the exact spelling from Column L so the TT reaches the right FRT login
+    const canon = {};
+    Object.values(REF.frtByCmp).forEach(arr=> arr.forEach(n=> canon[normFrt_(n)] = n));
+    const list = uniq_(access.map(f=> canon[normFrt_(f)] || f));
+    fillSelect(frtSel, list, 'Select FRT');
+  }
+}
+/* ================= TT <-> GOOGLE SHEET (Verification) =================
+   One row per TT. Header names are the field keys. */
+const TEMP_FIELD_MAP = [['fldTD','T&D (meter)'],['fldA2UG','A2UG (meter)'],['fldJC','JC Rehab (nos)'],['fldAerial','Aerial Rehab (meter)'],
+  ['fldPCC','PCC (meter)'],['fldMH','MH Installation (nos)'],['fldSafeguard','Safeguarding (meter)'],['fldTrayRemove','Tray Remove (nos)']];
+const PC_FIELD_MAP = [['pcSiteId','Site ID'],['pcSiteType','Site Type'],['pcFaultType','PC Fault Type'],['pcRoxtec','Roxtec Sealing'],
+  ['pcDoorAlign','Door Alignment'],['pcRooting','PC Rooting'],['pcCondition','PC Condition'],['pcBottomPCC','Bottom PCC'],['pcFdmsSealing','FDMS Sealing']];
+const PHOTO_FIELD_MAP = [['prePhotos','Pre Photo'],['postPhotos','Post Photo'],['trayPhotos','Tray Photo'],
+  ['jcPhotos','JC Photo'],['mhPhotos','MH Photo'],['pcRoutingPhotos','PC Rooting Photo'],['cableEntryPhotos','Cable Entry Photo'],
+  ['fdmsPhotos','FDMS Photo'],['bottomPccPhotos','Bottom PCC Photo']];
+
+function ymdToDmy_(ymd){ const m = String(ymd||'').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m ? (m[3]+'-'+m[2]+'-'+m[1]) : String(ymd||''); }
+function parseOpenAt_(d, t){
+  d = String(d||'').trim(); t = String(t||'00:00:00').trim() || '00:00:00';
+  let m = d.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+  let ymd = m ? (m[3]+'-'+pad2_(m[2])+'-'+pad2_(m[1])) : d;
+  if(t.length === 5) t += ':00';
+  const dt = new Date(ymd + 'T' + t);
+  return isNaN(dt) ? new Date().toISOString() : dt.toISOString();
+}
+function fmtDur_(ms, withSec){
+  if(ms == null || isNaN(ms)) return '';
+  const abs = Math.max(0, ms);
+  const h = Math.floor(abs/3600000), mi = Math.floor((abs%3600000)/60000), se = Math.floor((abs%60000)/1000);
+  return withSec ? `${pad2_(h)}:${pad2_(mi)}:${pad2_(se)}` : `${pad2_(h)}:${pad2_(mi)}`;
+}
+function driveId_(url){ const m = String(url||'').match(/\/d\/([A-Za-z0-9_-]+)/) || String(url||'').match(/[?&]id=([A-Za-z0-9_-]+)/); return m ? m[1] : ''; }
+function urlToPhoto_(url){
+  const id = driveId_(url);
+  return { dataUrl: id ? ('https://drive.google.com/thumbnail?id=' + id + '&sz=w600') : url, full: url, tsLabel:'', geo:'' };
+}
+function splitUrls_(v){ return String(v||'').split(/\s*\n\s*|\s*,\s*(?=https?:)/).map(x=>x.trim()).filter(x=>/^https?:/.test(x)); }
+
+/* client TT object -> sheet fields (Add New TT) */
+function faultToFields_(f){
+  const d = new Date(f.openAt);
+  return {
+    'CMP': f.cmp, 'Link Name': f.link, 'Span Name': f.span, 'Affected Service': f.faultType2 === '-' ? '' : (f.faultType2||''),
+    'TT Open Date': ymdToDmy_(localDateInputValue(d)), 'TT Open Time': localTimeInputValue(d),
+    'Engineer Name': f.engineer, 'Supervisor Name': f.supervisor, 'FRT Name': f.frt,
+    'Fault Type': f.faultType1, 'WO No': f.woNo, 'FIP Repeat': String(f.fipRepeat||0), 'Link Repeat': String(f.linkRepeat||0)
+  };
+}
+/* FRT draft -> sheet fields (photos must already be Drive URLs) */
+function draftToFields_(dr, tt, photoUrls){
+  const openAt = new Date(tt.openAt).getTime();
+  const f = {
+    'PPRJ Code': (session && session.pprj) ? ('PPRJ' + session.pprj) : '',
+    'Domain': 'Access',
+    'Travel Time': dr.firstPreTs ? fmtDur_(dr.firstPreTs - openAt, true) : '',
+    'Restore Time': dr.firstPostTs ? fmtDur_(dr.firstPostTs - openAt, false) : '',
+    'Ownership': dr.ownership||'', 'Fault Type Detail': dr.faultType3||'',
+    'Details / RCA': dr.rca||'', 'Delay Reason': dr.delayReason||'',
+    'Restoration Type 1': dr.restorationType1||'', 'Restoration Type 2': dr.restorationType||'',
+    'CBUD Entry': dr.cbudOn ? 'Yes' : 'No', 'CBUD Portal Entry No.': dr.cbudOn ? (dr.cbudNo||'') : '',
+    'CBUD Snap': dr.cbudOn ? (photoUrls.cbudSnap||[]).join('\n') : '',
+    'Pre Video': (photoUrls.preVideo||[]).join('\n'), 'Post Video': (photoUrls.postVideo||[]).join('\n')
+  };
+  TEMP_FIELD_MAP.forEach(([k,h])=> f[h] = (dr.tempFields||{})[k] || '');
+  PC_FIELD_MAP.forEach(([k,h])=> f[h] = dr[k] || '');
+  PHOTO_FIELD_MAP.forEach(([k,h])=> f[h] = (photoUrls[k]||[]).join('\n'));
+  f['JPW Snap'] = (photoUrls.jpwPhoto||[]).join('\n');
+  return f;
+}
+/* sheet row -> dashboard fault */
+function rowToFault_(r){
+  return {
+    ttNo: r['TT No'], cmp: r['CMP']||'', link: r['Link Name']||'', span: r['Span Name']||'',
+    openAt: parseOpenAt_(r['TT Open Date'], r['TT Open Time']),
+    engineer: r['Engineer Name']||'', supervisor: r['Supervisor Name']||'', frt: r['FRT Name']||'',
+    faultType1: r['Fault Type']||'', faultType2: r['Affected Service']||'-', woNo: r['WO No']||'',
+    fipRepeat: r['FIP Repeat']||0, linkRepeat: r['Link Repeat']||0, status:'open'
+  };
+}
+/* sheet row -> review entry */
+function rowToReview_(r){
+  const dr = { tempFields:{}, jpwPhoto:null };
+  PHOTO_FIELD_MAP.forEach(([k,h])=> dr[k] = splitUrls_(r[h]).map(urlToPhoto_));
+  const jpw = splitUrls_(r['JPW Snap']); dr.jpwPhoto = jpw.length ? urlToPhoto_(jpw[0]) : null;
+  TEMP_FIELD_MAP.forEach(([k,h])=> dr.tempFields[k] = r[h]||'');
+  PC_FIELD_MAP.forEach(([k,h])=> dr[k] = r[h]||'');
+  dr.ownership = r['Ownership']||''; dr.faultType3 = r['Fault Type Detail']||''; dr.rca = r['Details / RCA']||'';
+  dr.delayReason = r['Delay Reason']||'';
+  dr.restorationType = r['Restoration Type 2'] || r['Restoration Type'] || '';
+  dr.restorationType1 = r['Restoration Type 1']||'';
+  dr.cbudOn = String(r['CBUD Entry']||'').toLowerCase() === 'yes';
+  dr.cbudNo = r['CBUD Portal Entry No.']||'';
+  const cs = splitUrls_(r['CBUD Snap']); dr.cbudSnap = cs.length ? urlToPhoto_(cs[0]) : null;
+  const pv = splitUrls_(r['Pre Video']); dr.preVideo = pv.length ? { kind:'video', full: pv[0] } : null;
+  const qv = splitUrls_(r['Post Video']); dr.postVideo = qv.length ? { kind:'video', full: qv[0] } : null;
+  dr.travelTime = r['Travel Time']||''; dr.restoreTime = r['Restore Time']||'';
+  return {
+    id: r['TT No'], ttNo: r['TT No'], cmp: r['CMP']||'', frt: r['FRT Name']||'', link: r['Link Name']||'', span: r['Span Name']||'',
+    engineer: r['Engineer Name']||'', supervisor: r['Supervisor Name']||'', faultType1: r['Fault Type']||'',
+    affected: r['Affected Service']||'', domain: r['Domain']||'Access', pprj: r['PPRJ Code']||'', submittedBy: r['Submitted By']||'',
+    submittedAt: r['Submitted At'] || r['Date'] || new Date().toISOString(),
+    draft: dr, rfoStatus: r['RFO Status']||'', fipId: r['FIP ID']||''
+  };
+}
+
+/* ================= INSTANT LOCAL UPDATE + BACKGROUND SHEET SYNC =================
+   - Change is applied to localStorage + screen IMMEDIATELY.
+   - The change waits in an "outbox" (also in localStorage) and is sent to the sheet in background.
+   - Every 30 sec the sheet is re-read silently; pending/just-sent changes are re-applied on top,
+     so the screen never jumps back to an old value. No page reload. */
+const LS_OUTBOX = 'rjcmwo_outbox';
+let outbox = lsGet(LS_OUTBOX, []) || [];
+let recentOps = [];                                   // sent in last 45 sec (sheet may still return old copy)
+function saveOutbox(){ lsSet(LS_OUTBOX, outbox); }
+function applyLocalOps_(readStartedAt){
+  const now = Date.now();
+  // a just-saved change is re-applied ONLY if this sheet read started before the save finished
+  recentOps = recentOps.filter(op=> now - op.doneAt < 45000 && (readStartedAt == null || readStartedAt < op.doneAt));
+  recentOps.concat(outbox).forEach(op=>{
+    if(op.type === 'faultType'){
+      const f = openFaults.find(x=> x.ttNo === op.ttNo);
+      if(f) f.faultType1 = op.value;
+    }
+  });
+}
+let flushing = false;
+async function flushOutbox(){
+  if(flushing || !outbox.length) return;
+  flushing = true;
+  try{
+    while(outbox.length){
+      const op = outbox[0];
+      let res;
+      try{
+        res = await callServer('updateTT', { ttNo: op.ttNo, action:'faultType', fields:{ 'Fault Type': op.value }, by: op.by });
+      }catch(e){ break; }                              // offline / server busy -> retry on next sync
+      outbox.shift(); saveOutbox();
+      if(res && res.ok){
+        op.doneAt = Date.now(); recentOps.push(op);
+      } else {
+        toast('Fault Type sheet me save nahi hua (' + op.ttNo + '): ' + ((res && res.error) || 'error'), 'err');
+        loadTTData(true);
+      }
+    }
+  } finally { flushing = false; }
+}
+
+let ttLoading = null;
+let ttSig = '';
+function ttSignature_(){
+  return JSON.stringify(openFaults) + '|' + JSON.stringify(reviewQueue.map(r=> [r.id, r.faultType1, r.submittedAt, r.engineer, r.supervisor, r.frt]));
+}
+function loadTTData(force){
+  if(ttLoading) return ttLoading;
+  const readStartedAt = Date.now();
+  ttLoading = callServer('getTTData').then(res=>{
+    if(!res || !res.ok) throw new Error((res && res.error) || 'TT data load failed.');
+    openFaults = res.rows.filter(r=> r['Status'] === 'Open').map(rowToFault_);
+    reviewQueue = res.rows.filter(r=> r['Status'] === 'Review Pending').map(rowToReview_);
+    applyLocalOps_(readStartedAt);                    // keep my unsaved / just-saved changes on screen
+    saveTTCache();
+    const sig = ttSignature_();
+    const changed = force || sig !== ttSig;
+    ttSig = sig;
+    refreshAfterTTLoad_(changed);
+    return true;
+  }).catch(err=>{ console.warn(err); return false; })
+    .finally(()=>{ ttLoading = null; });
+  return ttLoading;
+}
+/* Silent screen update after sync — only re-draws when data actually changed */
+function refreshAfterTTLoad_(changed){
+  if(!session) return;
+  updateReviewCount();
+  // keep the TT open on detail / location page pointing to the fresh object
+  if(currentDetailTT){
+    const fresh = openFaults.find(f=> f.ttNo === currentDetailTT.ttNo);
+    if(fresh){
+      currentDetailTT = fresh;
+      if(currentPage === 'detail'){
+        const sel = document.getElementById('detailFaultTypeSel');
+        if(document.activeElement !== sel && sel.value !== fresh.faultType1 &&
+           Array.from(sel.options).some(o=> o.value === fresh.faultType1)) sel.value = fresh.faultType1;
+        refreshDetailActionButton();
+      }
+    } else if(currentPage === 'detail'){
+      toast('Yeh TT ab Open nahi hai (kisi aur ne update kiya).','err');
+      goHome();
+      return;
+    }
+  }
+  if(!changed) return;
+  if(currentPage === 'home') renderOpenFaults();
+  else if(currentPage === 'review') renderReviewList();
+}
+/* 30-sec background sync: send pending changes, then read fresh data */
+async function backgroundSync_(){
+  if(!session || document.visibilityState !== 'visible') return;
+  await flushOutbox();
+  if(currentPage !== 'loc') loadTTData();
+}
+
+/* Upload every captured photo (data:...) to Drive — 4 photos in PARALLEL (fast).
+   Returns { prePhotos:[url..], ..., jpwPhoto:[url] } */
+async function uploadDraftPhotos_(ttNo, dr, onProgress){
+  const jobs = [];
+  PHOTO_FIELD_MAP.forEach(([k])=> (dr[k]||[]).forEach((ph,i)=> jobs.push({ k, i, ph })));
+  if(dr.jpwPhoto) jobs.push({ k:'jpwPhoto', i:0, ph: dr.jpwPhoto });
+  if(dr.cbudOn && dr.cbudSnap) jobs.push({ k:'cbudSnap', i:0, ph: dr.cbudSnap });
+  ['preVideo','postVideo'].forEach(k=>{ if(dr[k]) jobs.push({ k, i:0, ph: dr[k], video:true }); });
+  const out = {};
+  PHOTO_FIELD_MAP.forEach(([k])=> out[k] = []);
+  out.jpwPhoto = []; out.cbudSnap = []; out.preVideo = []; out.postVideo = [];
+  const needUpload = jobs.some(j=> !j.ph.full && /^data:/.test(j.ph.dataUrl||''));
+  let folderId = '';
+  if(needUpload){
+    const fr = await callServer('prepareTTFolder', { ttNo });       // one folder per TT, created once
+    if(!fr || !fr.ok) throw new Error((fr && fr.error) || 'Drive folder error');
+    folderId = fr.folderId;
+  }
+  let done = 0, next = 0;
+  const results = new Array(jobs.length);
+  async function worker(){
+    while(next < jobs.length){
+      const idx = next++;
+      const j = jobs[idx];
+      let url = j.ph.full || '';
+      if(j.video && !url){                                           // video: wait for its background upload
+        url = await ensureVideoUploaded_(ttNo, j.k, j.ph);
+      }
+      if(!url && /^data:/.test(j.ph.dataUrl||'')){
+        let res = null, tries = 0;
+        while(tries < 2){                                           // 1 automatic retry
+          tries++;
+          try{ res = await callServer('uploadPhoto', { ttNo, folderId, dataUrl: j.ph.dataUrl, fileName: ttNo + '_' + j.k + '_' + (j.i+1) + '.jpg' }); }
+          catch(e){ res = { ok:false, error:e.message }; }
+          if(res && res.ok) break;
+        }
+        if(!res || !res.ok) throw new Error((res && res.error) || 'Photo upload failed');
+        url = res.url;
+        j.ph.full = url;                                            // remember -> no re-upload on retry
+      } else if(!url){ url = j.ph.dataUrl || ''; }
+      results[idx] = url;
+      done++;
+      if(onProgress) onProgress(done, jobs.length);
+    }
+  }
+  if(onProgress && jobs.length) onProgress(0, jobs.length);
+  await Promise.all(Array.from({ length: Math.min(4, jobs.length) }, worker));
+  jobs.forEach((j, idx)=> out[j.k].push(results[idx]));
+  return out;
+}
+
+/* One-time: move TTs saved only in this browser (old version) into the Verification sheet */
+async function migrateLocalTTs(){
+  if(lsGet(LS_MIGRATED, false) || !session) return;
+  const oldFaults = lsGet(LS.openFaults, []) || [];
+  const oldReviews = lsGet(LS.reviewQueue, []) || [];
+  const oldClosed = lsGet('rjcmwo_closed', []) || [];
+  const oldDb = lsGet('rjcmwo_database', []) || [];
+  const isDemo = x => /^RV-DEMO/.test(x.id||'');
+  const items = [];
+  try{
+    oldFaults.forEach(f=> items.push({ ttNo:f.ttNo, status:'Open', fields: faultToFields_(f) }));
+    for(const [list, status] of [[oldReviews.filter(x=>!isDemo(x)),'Review Pending'], [oldDb.filter(x=>!isDemo(x)),'Approved']]){
+      for(const r of list){
+        const tt = Object.assign({ openAt: r.submittedAt }, r);
+        const urls = await uploadDraftPhotos_(r.ttNo, r.draft||{});
+        const f = Object.assign(faultToFields_(Object.assign({ faultType2:'', woNo:'' }, tt)), draftToFields_(r.draft||{}, tt, urls),
+          { 'Submitted At': r.submittedAt, 'TT Open Date':'', 'TT Open Time':'' });
+        if(status === 'Approved'){ f['RFO Status'] = r.rfoStatus||''; f['FIP ID'] = r.fipId||''; f['Reviewed At'] = r.submittedAt; }
+        items.push({ ttNo:r.ttNo, status, fields:f });
+      }
+    }
+    oldClosed.forEach(c=> items.push({ ttNo:c.ttNo, status:'Closed', fields:{
+      'CMP':c.cmp||'', 'FRT Name':c.frt||'', 'Fault Type':c.faultType1||'', 'Closed By':c.closedBy||'', 'Closed At':c.closedAt||'',
+      'Other Category':c.otherCategory||'', 'SO6 No':c.so6No||'', 'Parent TT':c.parentTT||'', 'PE No':c.peNo||'',
+      'Auto Restored RCA':c.autoRestoredRCA||'', 'SFP Status':c.sfpStatus||'' } }));
+    if(items.length){
+      const res = await callServer('migrateLocal', { items, by: session.name + ' (' + session.role + ')' });
+      if(!res || !res.ok) throw new Error((res && res.error) || 'Migration failed');
+      if(res.added) toast(res.added + ' purane TT Verification sheet me save ho gaye ✔','ok');
+    }
+    ['rjcmwo_openFaults','rjcmwo_reviewQueue','rjcmwo_closed','rjcmwo_database'].forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
+    lsSet(LS_MIGRATED, true);
+  }catch(err){
+    console.warn('Migration', err);
+  }
+}
+function whoAmI_(){ return session ? (session.name + ' (' + session.role + ')') : ''; }
+
+/* ================= LINK / SPAN : type-to-filter dropdown =================
+   Source: Support sheet (Link Name / Span Name of the selected CMP), from localStorage cache.
+   - Matching text is shown bold + blue.
+   - Typed value is allowed even if it is not in the Support sheet. */
+function linkRow_(r){
+  return Array.isArray(r) ? { cmp:r[0]||'', link:r[1]||'', span:r[2]||'' }
+                          : { cmp:(r&&r.cmp)||'', link:(r&&r.link)||'', span:(r&&r.span)||'' };
+}
+let acCache = { key:'', links:[], spansByLink:{}, spans:[] };
+function acBuildForCmp_(cmp){
+  const key = String(cmp||'').toLowerCase() + '|' + (REF.links||[]).length;
+  if(acCache.key === key) return acCache;
+  const links = [], spans = [], spansByLink = {}, seenL = {}, seenS = {};
+  (REF.links||[]).forEach(raw=>{
+    const r = linkRow_(raw);
+    if(cmp && r.cmp && r.cmp.toLowerCase() !== String(cmp).toLowerCase()) return;
+    if(r.link && !seenL[r.link]){ seenL[r.link] = 1; links.push(r.link); }
+    if(r.span && !seenS[r.span]){ seenS[r.span] = 1; spans.push(r.span); }
+    if(r.link && r.span){
+      const k = r.link.toLowerCase();
+      (spansByLink[k] = spansByLink[k] || []);
+      if(spansByLink[k].indexOf(r.span) === -1) spansByLink[k].push(r.span);
+    }
+  });
+  acCache = { key, links, spans, spansByLink };
+  return acCache;
+}
+function linkSource_(){
+  return acBuildForCmp_(document.getElementById('newCMP').value).links;
+}
+function spanSource_(){
+  const c = acBuildForCmp_(document.getElementById('newCMP').value);
+  const link = document.getElementById('newLinkName').value.trim().toLowerCase();
+  const first = (link && c.spansByLink[link]) || [];
+  if(!first.length) return c.spans;
+  return first.concat(c.spans.filter(x=> first.indexOf(x) === -1));   // selected link's spans first
+}
+
+const AC = { box:null, input:null, items:[], idx:-1, source:null };
+function escHtml_(v){ return String(v).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+function acHighlight_(v, q){
+  if(!q) return escHtml_(v);
+  const i = v.toLowerCase().indexOf(q);
+  if(i < 0) return escHtml_(v);
+  return escHtml_(v.slice(0,i)) + '<span class="ac-hl">' + escHtml_(v.substr(i, q.length)) + '</span>' + escHtml_(v.slice(i + q.length));
+}
+function acInit(inputId, sourceFn, onSelect){
+  const inp = document.getElementById(inputId);
+  inp._acOnSelect = onSelect || null;
+  if(!AC.box){
+    AC.box = document.createElement('div');
+    AC.box.className = 'ac-list';
+    document.body.appendChild(AC.box);
+    window.addEventListener('resize', acPosition);
+    window.addEventListener('scroll', acPosition, true);
+  }
+  inp.addEventListener('input', ()=> acShow(inp, sourceFn));
+  inp.addEventListener('focus', ()=> acShow(inp, sourceFn));
+  inp.addEventListener('keydown', e=> acKey(e));
+  inp.addEventListener('blur', ()=> setTimeout(()=>{ if(AC.input === inp) acHide(); }, 150));
+}
+function acPosition(){
+  if(!AC.input || !AC.box.classList.contains('show')) return;
+  const r = AC.input.getBoundingClientRect();
+  const below = window.innerHeight - r.bottom;
+  AC.box.style.left = r.left + 'px';
+  AC.box.style.width = r.width + 'px';
+  if(below < 200 && r.top > below){            // not enough space below -> open upward
+    AC.box.style.top = ''; AC.box.style.bottom = (window.innerHeight - r.top + 4) + 'px';
+    AC.box.style.maxHeight = Math.min(280, r.top - 12) + 'px';
+  } else {
+    AC.box.style.bottom = ''; AC.box.style.top = (r.bottom + 4) + 'px';
+    AC.box.style.maxHeight = Math.min(280, below - 12) + 'px';
+  }
+}
+function acShow(inp, sourceFn){
+  AC.input = inp; AC.source = sourceFn; AC.idx = -1;
+  const raw = inp.value.trim();
+  const q = raw.toLowerCase();
+  const all = sourceFn() || [];
+  let list = q ? all.filter(v=> v.toLowerCase().indexOf(q) > -1) : all.slice();
+  if(q){                                        // "starts with" matches first
+    list = list.filter(v=> v.toLowerCase().indexOf(q) === 0).concat(list.filter(v=> v.toLowerCase().indexOf(q) > 0));
+  }
+  const total = list.length;
+  const MAX = 100;
+  AC.items = list.slice(0, MAX);
+  let html = AC.items.map((v,i)=> `<div class="ac-item" data-i="${i}">${acHighlight_(v, q)}</div>`).join('');
+  if(!all.length) html = `<div class="ac-note">Is CMP ki list Support sheet me nahi mili — apni value type karein.</div>`;
+  else if(!total) html = `<div class="ac-note">Koi match nahi mila — typed value "<span class="ac-hl">${escHtml_(raw)}</span>" hi save hogi.</div>`;
+  else if(total > MAX) html += `<div class="ac-note">${total} results — aur filter karne ke liye type karein.</div>`;
+  AC.box.innerHTML = html;
+  AC.box.querySelectorAll('.ac-item').forEach(el=>{
+    el.addEventListener('mousedown', e=>{ e.preventDefault(); acSelect(+el.dataset.i); });
+  });
+  AC.box.classList.add('show');
+  AC.box.scrollTop = 0;
+  acPosition();
+}
+function acHide(){ if(AC.box) AC.box.classList.remove('show'); AC.idx = -1; }
+function acSelect(i){
+  const v = AC.items[i];
+  if(v == null || !AC.input) return;
+  AC.input.value = v;
+  const cb = AC.input._acOnSelect;
+  acHide();
+  if(cb) cb(v);
+}
+function acKey(e){
+  if(!AC.box || !AC.box.classList.contains('show')){
+    if(e.key === 'ArrowDown' && AC.input) acShow(AC.input, AC.source);
+    return;
+  }
+  const els = AC.box.querySelectorAll('.ac-item');
+  if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    e.preventDefault();
+    if(!els.length) return;
+    AC.idx = e.key === 'ArrowDown' ? Math.min(AC.idx + 1, els.length - 1) : Math.max(AC.idx - 1, 0);
+    els.forEach((el,i)=> el.classList.toggle('active', i === AC.idx));
+    els[AC.idx].scrollIntoView({ block:'nearest' });
+  } else if(e.key === 'Enter'){
+    if(AC.idx > -1){ e.preventDefault(); e.stopPropagation(); acSelect(AC.idx); }
+    else acHide();
+  } else if(e.key === 'Escape' || e.key === 'Tab'){
+    acHide();
+  }
+}
+
+/* ================= LOGIN MODE TOGGLES ================= */
+let loginMode = 'FRT';
+function setLoginMode(mode){
+  loginMode = mode;
+  document.getElementById('btnModeFRT').classList.toggle('inactive', mode!=='FRT');
+  document.getElementById('btnModeOthers').classList.toggle('inactive', mode!=='OTHERS');
+  document.getElementById('loginFRTFields').classList.toggle('hidden', mode!=='FRT');
+  document.getElementById('loginOthersFields').classList.toggle('hidden', mode!=='OTHERS');
+  fillSavedPassword();
+}
+let cpMode = 'FRT';
+function setCpMode(mode){
+  cpMode = mode;
+  document.getElementById('btnCpModeFRT').classList.toggle('inactive', mode!=='FRT');
+  document.getElementById('btnCpModeOthers').classList.toggle('inactive', mode!=='OTHERS');
+  document.getElementById('cpFRTFields').classList.toggle('hidden', mode!=='FRT');
+  document.getElementById('cpOthersFields').classList.toggle('hidden', mode!=='OTHERS');
+}
+function goToChangePassword(){
+  showScreen('cp');
+  setCpMode('FRT');
+}
+
+/* init dropdowns */
+/* Re-fill a <select> but keep the user's current choice if it still exists */
+function keepVal(id, fillFn){
+  const el = document.getElementById(id);
+  const old = el ? el.value : '';
+  fillFn();
+  if(el && old && Array.from(el.options).some(o=>o.value===old)) el.value = old;
+}
+function initRefDropdowns(){
+  const frtCmps = REF.frtCmpList || [];   // unique list from User sheet Column K
+  const cmpPh = frtCmps.length ? 'Select CMP' : (refLoadedOnce ? 'No CMP in User sheet (Column K)' : 'Loading CMP list...');
+  keepVal('loginCMP', ()=> fillSelect(document.getElementById('loginCMP'), frtCmps, cmpPh));
+  keepVal('loginFRTName', ()=> populateFRTNames('loginCMP','loginFRTName'));
+  keepVal('cpCMP', ()=> fillSelect(document.getElementById('cpCMP'), frtCmps, cmpPh));
+  keepVal('cpFRTName', ()=> populateFRTNames('cpCMP','cpFRTName'));
+  keepVal('newCMP', ()=> fillSelect(document.getElementById('newCMP'), REF.cmpList, 'Select CMP'));
+  const keepNew = { f:document.getElementById('newFRTName').value, e:document.getElementById('newEngineer').value, s:document.getElementById('newSupervisor').value };
+  onNewCMPChange();
+  const restoreSel = (id,v)=>{ const el=document.getElementById(id); if(v && Array.from(el.options).some(o=>o.value===v)) el.value=v; };
+  restoreSel('newEngineer', keepNew.e);
+  restoreSel('newSupervisor', keepNew.s);
+  if(keepNew.s) onNewSupervisorChange();
+  restoreSel('newFRTName', keepNew.f);
+  fillDatalist('siteIdOptions', REF.sites || []);
+  keepVal('newAffectedService', ()=> fillSelect(document.getElementById('newAffectedService'), REF.services || [], 'Select Affected Service'));
+  fillFaultType3_();
+  keepVal('filterCMP', ()=> fillSelect(document.getElementById('filterCMP'), REF.cmpList, 'All'));
+  keepVal('rvCMP', ()=> fillSelect(document.getElementById('rvCMP'), REF.cmpList, 'All'));
+  keepVal('rvFaultType', ()=> fillSelect(document.getElementById('rvFaultType'), FAULT_TYPES, 'All'));
+  if(session && session.role) applyRoleFilters();
+  else keepVal('filterFaultType', ()=> fillSelect(document.getElementById('filterFaultType'), FAULT_TYPES, 'All'));
+  restoreLastLogin();
+}
+/* Background refresh — no loader, no blocking. Cached data is already on screen. */
+let lastRefError = '';
+function loadReferenceData(){
+  return callServer('getReferenceData').then(res=>{
+    if(!res || !res.ok) throw new Error((res && res.error) || 'Reference data load failed.');
+    REF = res.data;
+    refLoadedOnce = true;
+    lsSet(LS_REF, { data: REF, savedAt: Date.now() });
+    initRefDropdowns();
+    return true;
+  }).catch(err=>{
+    lastRefError = err.message;
+    // Only warn if there is no cached data at all
+    if(!(REF.frtCmpList||[]).length) toast('Sheet data load nahi hua: ' + err.message, 'err');
+    return false;
+  });
+}
+
+/* Remember last used login mode / CMP / FRT / PPRJ / User ID (never the password) */
+let lastLoginRestored = false;
+function restoreLastLogin(){
+  const last = lsGet(LS_LAST, null);
+  if(!last) return;
+  if(!lastLoginRestored){ setLoginMode(last.mode === 'OTHERS' ? 'OTHERS' : 'FRT'); lastLoginRestored = true; }
+  const cmpEl = document.getElementById('loginCMP');
+  if(last.cmp && !cmpEl.dataset.touched && Array.from(cmpEl.options).some(o=>o.value===last.cmp)){
+    cmpEl.value = last.cmp; populateFRTNames('loginCMP','loginFRTName');
+    const frtEl = document.getElementById('loginFRTName');
+    if(last.frt && Array.from(frtEl.options).some(o=>o.value===last.frt)) frtEl.value = last.frt;
+  }
+  const pp = document.getElementById('loginPPRJ'); if(last.pprj && !pp.value) pp.value = last.pprj;
+  const uid = document.getElementById('loginUserId'); if(last.userId && !uid.value) uid.value = last.userId;
+  fillSavedPassword();
+}
+
+/* ================= LOGIN / LOGOUT ================= */
+let loginBusy = false;
+function showErr(boxId, msg){
+  const box = document.getElementById(boxId);
+  box.textContent = msg; box.classList.remove('hidden');
+}
+function readLoginForm(){
+  const pw = document.getElementById('loginPassword').value;
+  if(loginMode === 'FRT'){
+    const cmp = document.getElementById('loginCMP').value;
+    const frt = document.getElementById('loginFRTName').value;
+    const pprj = document.getElementById('loginPPRJ').value;
+    if(!cmp || !frt) return { err:'CMP aur FRT Name select karein.' };
+    if(pprj.length !== 8) return { err:'PPRJ Code 8 digit ka hona chahiye.' };
+    if(!pw) return { err:'Password fill karein.' };
+    return { payload:{ mode:'FRT', cmp, frt, pprj, password:pw } };
+  }
+  const uid = document.getElementById('loginUserId').value.trim();
+  if(!uid || !pw) return { err:'User ID aur Password dono fill karein.' };
+  return { payload:{ mode:'OTHERS', userId:uid, password:pw } };
+}
+function startSession(sess, payload){
+  session = Object.assign({}, sess, { _key: credKey(payload) });
+  if(payload.mode === 'FRT'){ session.pprj = payload.pprj; session.cmp = payload.cmp; session.frt = payload.frt; }
+  lsSet(LS.session, session);
+  lsSet(LS_LAST, { mode:payload.mode, cmp:payload.cmp||'', frt:payload.frt||'', pprj:payload.pprj||'', userId:payload.userId||'' });
+  if(document.getElementById('rememberPw').checked) savePw(session._key, payload.password);
+  else removeSavedPw(session._key);
+  const pwEl = document.getElementById('loginPassword'); pwEl.value = ''; pwEl.dataset.auto = '';
+  enterApp();
+  migrateLocalTTs().then(()=> loadTTData());
+}
+async function doLogin(){
+  if(loginBusy) return;
+  document.getElementById('loginErr').classList.add('hidden');
+  const f = readLoginForm();
+  if(f.err){ showErr('loginErr', f.err); return; }
+  const payload = f.payload;
+  const key = credKey(payload);
+  const hash = await hashPw(key, payload.password);
+  const cached = getCreds()[key];
+
+  // ---- INSTANT login from localStorage (verified with Sheet in background) ----
+  if(cached && cached.hash === hash && cached.session){
+    startSession(cached.session, payload);
+    toast('Welcome ' + session.name + '!','ok');
+    callServer('loginUser', payload).then(res=>{
+      if(res && res.ok){
+        saveCred(key, hash, res.session);              // refresh access (role / CMP etc.)
+        if(session && session._key === key){
+          session = Object.assign({}, res.session, { _key:key },
+            payload.mode==='FRT' ? { pprj:payload.pprj, cmp:payload.cmp, frt:payload.frt } : {});
+          lsSet(LS.session, session);
+          document.getElementById('userChip').innerHTML = session.name + '<small>'+session.jobRole+'</small>';
+        }
+      } else if(res && res.authFail){
+        removeCred(key); removeSavedPw(key);          // password changed / user removed in Sheet
+        doLogout();
+        showErr('loginErr', res.error + ' (Sheet me password/access change hua hai, dobara login karein.)');
+      }
+    }).catch(()=>{ /* offline / server busy -> keep cached login */ });
+    return;
+  }
+
+  // ---- First time / password changed -> check with Sheet ----
+  loginBusy = true;
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = '⏳ Checking...';
+  try{
+    const res = await callServer('loginUser', payload);
+    if(!res || !res.ok){ showErr('loginErr', (res && res.error) || 'Invalid User ID or Password.'); return; }
+    saveCred(key, hash, res.session);
+    startSession(res.session, payload);
+    toast('Welcome ' + session.name + '!','ok');
+  }catch(err){
+    showErr('loginErr', 'Server error: ' + err.message);
+  }finally{
+    loginBusy = false;
+    btn.disabled = false; btn.textContent = '➡️ Login';
+  }
+}
+async function doChangePassword(){
+  if(loginBusy) return;
+  document.getElementById('cpErr').classList.add('hidden');
+  const oldPw = document.getElementById('cpOldPassword').value;
+  const newPw = document.getElementById('cpNewPassword').value;
+  if(!oldPw || !newPw){ showErr('cpErr','Please fill old and new password.'); return; }
+  if(newPw.length < 4){ showErr('cpErr','New password kam se kam 4 characters ka hona chahiye.'); return; }
+  if(newPw === oldPw){ showErr('cpErr','New password old password se alag hona chahiye.'); return; }
+  let payload;
+  if(cpMode === 'FRT'){
+    const cmp = document.getElementById('cpCMP').value;
+    const frt = document.getElementById('cpFRTName').value;
+    if(!cmp || !frt){ showErr('cpErr','CMP aur FRT Name select karein.'); return; }
+    payload = { mode:'FRT', cmp, frt, oldPassword:oldPw, newPassword:newPw };
+  } else {
+    const uid = document.getElementById('cpUserId').value.trim();
+    if(!uid){ showErr('cpErr','User ID fill karein.'); return; }
+    payload = { mode:'OTHERS', userId:uid, oldPassword:oldPw, newPassword:newPw };
+  }
+  loginBusy = true;
+  const btn = document.getElementById('cpBtn');
+  btn.disabled = true; btn.textContent = '⏳ Updating...';
+  try{
+    const res = await callServer('changePassword', payload);
+    if(!res || !res.ok){ showErr('cpErr', (res && res.error) || 'Old password incorrect.'); return; }
+    // keep instant login working with the NEW password
+    const key = credKey(payload);
+    const c = getCreds()[key];
+    if(c){ saveCred(key, await hashPw(key, newPw), c.session); }
+    if(getSavedPw(key)) savePw(key, newPw);
+    document.getElementById('cpOldPassword').value = '';
+    document.getElementById('cpNewPassword').value = '';
+    toast('Password updated successfully!','ok');
+    showScreen('login');
+  }catch(err){
+    showErr('cpErr', 'Server error: ' + err.message);
+  }finally{
+    loginBusy = false;
+    btn.disabled = false; btn.textContent = '💾 Update Password';
+  }
+}
+function doLogout(){
+  session = null;
+  localStorage.removeItem(LS.session);
+  stopAllClocks();
+  showScreen('login');
+  fillSavedPassword();
+}
+
+/* ================= APP ENTRY / HOME ================= */
+function enterApp(){
+  showScreen('app');
+  document.getElementById('userChip').innerHTML = session.name + '<small>'+session.jobRole+'</small>';
+  const isNOC = (session.role === 'NOC' || session.role === 'Admin');
+  document.getElementById('addTTBtn').classList.toggle('hidden', !isNOC);
+  // Review button visible to everyone; scope/rights differ by role (see myReviewEntries/canSubmitReview).
+
+  applyRoleFilters();
+  goHome();
+  updateReviewCount();
+}
+/* Home filters by role (also re-run silently after background data refresh) */
+function applyRoleFilters(){
+  const isFRTUser = session.role === 'FRT';
+  document.getElementById('filterCMPWrap').classList.toggle('hidden', isFRTUser);
+  document.getElementById('filterFRTWrap').classList.toggle('hidden', isFRTUser);
+
+  // fault type filter restriction
+  const allowAll = (session.role === 'NOC' || session.role === 'Admin');
+  const ftOptions = allowAll ? ["Fiber Cut","Patch Chord","SFP Issue","Others"] : ["Fiber Cut","Patch Chord"];
+  keepVal('filterFaultType', ()=> fillSelect(document.getElementById('filterFaultType'), ftOptions, 'All'));
+
+  if(isFRTUser){
+    fillSelect(document.getElementById('filterFRT'), [session.frt], null);
+    document.getElementById('filterFRT').value = session.frt;
+  } else {
+    onFilterCMPChange('filterCMP','filterFRT');
+  }
+}
+function goHome(){
+  document.getElementById('homePage').classList.remove('hidden');
+  document.getElementById('detailPage').classList.add('hidden');
+  document.getElementById('locPage').classList.add('hidden');
+  document.getElementById('reviewListPage').classList.add('hidden');
+  stopAllClocks();
+  renderOpenFaults();
+  setPage('home');
+}
+function backToHome(){ goHome(); }
+
+/* ================= HEADER: PAGE TRACKING / BACK / RESET ================= */
+let currentPage = 'home';
+function setPage(p){
+  currentPage = p;
+  document.getElementById('headerBackBtn').classList.toggle('hidden', p==='home');
+}
+function headerBack(){
+  if(currentPage === 'detail') goHome();
+  else if(currentPage === 'loc') backToDetailFromLoc();
+  else if(currentPage === 'review') goHome();
+  else goHome();
+}
+/* 🔄 button: page reset + sync localStorage data with Google Sheet
+   (dropdown lists + logged-in user's role / access / password check) */
+let syncBusy = false;
+async function headerResetSync(){
+  headerReset();
+  if(syncBusy) return;
+  syncBusy = true;
+  const btn = document.getElementById('headerResetBtn');
+  btn.classList.add('spinning');
+  try{
+    const refOk = await loadReferenceData();
+    if(!refOk) throw new Error(lastRefError || 'Sheet se data nahi aaya.');
+    await flushOutbox();
+    const ttOk = await loadTTData(true);
+    if(!ttOk) throw new Error('TT data (Verification sheet) load nahi hua.');
+    if(session && session._key){
+      const pw = getSavedPw(session._key);
+      if(pw){
+        const payload = session.role === 'FRT'
+          ? { mode:'FRT', cmp:session.cmp, frt:session.frt, pprj:session.pprj, password:pw }
+          : { mode:'OTHERS', userId:session.userId, password:pw };
+        const res = await callServer('loginUser', payload);
+        if(res && res.ok){
+          const key = session._key;
+          session = Object.assign({}, res.session, { _key:key },
+            payload.mode==='FRT' ? { pprj:payload.pprj, cmp:payload.cmp, frt:payload.frt } : {});
+          lsSet(LS.session, session);
+          saveCred(key, await hashPw(key, pw), res.session);
+          document.getElementById('userChip').innerHTML = session.name + '<small>'+session.jobRole+'</small>';
+          const isNOC = (session.role === 'NOC' || session.role === 'Admin');
+          document.getElementById('addTTBtn').classList.toggle('hidden', !isNOC);
+          applyRoleFilters();
+        } else if(res && res.authFail){
+          const key = session._key;
+          removeCred(key); removeSavedPw(key);
+          doLogout();
+          showErr('loginErr', res.error + ' (Sheet me password/access change hua hai, dobara login karein.)');
+          return;
+        }
+      }
+    }
+    if(currentPage === 'home') renderOpenFaults();
+    updateReviewCount();
+    toast('Data synced with Google Sheet ✔','ok');
+  }catch(err){
+    toast('Sync nahi hua: ' + err.message, 'err');
+  }finally{
+    syncBusy = false;
+    btn.classList.remove('spinning');
+  }
+}
+function headerReset(){
+  if(currentPage === 'home'){
+    document.getElementById('filterCMP').value = '';
+    onFilterCMPChange('filterCMP','filterFRT');
+    document.getElementById('filterFRT').value = (session && session.role==='FRT') ? session.frt : '';
+    document.getElementById('filterFaultType').value = '';
+    renderOpenFaults();
+  } else if(currentPage === 'detail'){
+  } else if(currentPage === 'loc'){
+    if(locMode === 'fiber' || locMode === 'patch'){
+      if(currentDraftKey) localStorage.removeItem(currentDraftKey);
+      draft = emptyDraft();
+      ['ownershipSel','faultType3Sel','pcSiteId','pcSiteType','pcFaultTypeSel','pcRoxtec','pcDoorAlign','pcRooting','pcCondition','pcBottomPCC','pcFdmsSealing']
+        .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+      document.getElementById('rcaDetails').value='';
+      document.getElementById('delayReason').value='';
+      document.getElementById('restorationTypeSel').value='';
+      document.getElementById('restorationType1Sel').value='';
+      document.getElementById('cbudToggle').checked = false;
+      document.getElementById('cbudNo').value = '';
+      applyCbudUI_();
+      ['fldTD','fldA2UG','fldJC','fldAerial','fldPCC','fldMH','fldSafeguard','fldTrayRemove'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+      ['prePhotoStrip','postPhotoStrip','trayPhotoStrip','jcPhotoStrip','mhPhotoStrip',
+        'pcRoutingPhotoStrip','cableEntryPhotoStrip','fdmsPhotoStrip','bottomPccPhotoStrip','jpwPhotoStrip','cbudSnapStrip'].forEach(id=> renderPhotoStrip(id, []));
+      renderVideoStrips_();
+      onSiteTypeChange();
+      onRestorationTypeChange();
+      updateTravelAndRestoreTime();
+      refreshChecklist();
+      toast('Form reset for this TT.','ok');
+    } else if(locMode === 'sfp'){
+      document.getElementById('sfpStatusSel').value = '';
+      toast('Form reset for this TT.','ok');
+    } else if(locMode === 'others'){
+      document.getElementById('otherCategorySel').value = '';
+      document.getElementById('so6No').value = '';
+      document.getElementById('parentTT').value = '';
+      document.getElementById('peNo').value = '';
+      document.getElementById('autoRestoredRCA').value = '';
+      onOtherCategoryChange();
+      toast('Form reset for this TT.','ok');
+    }
+  } else if(currentPage === 'review'){
+    const today = localDateInputValue(new Date());
+    document.getElementById('rvFromDate').value = today;
+    document.getElementById('rvToDate').value = today;
+    document.getElementById('rvDomain').value = '';
+    document.getElementById('rvCMP').value = '';
+    onFilterCMPChange('rvCMP','rvFRT');
+    document.getElementById('rvFRT').value = '';
+    document.getElementById('rvFaultType').value = '';
+    renderReviewList();
+  }
+}
+
+function faultBadgeClass(ft){
+  if(ft==='Fiber Cut') return 'badge-fiber';
+  if(ft==='Patch Chord') return 'badge-patch';
+  if(ft==='SFP Issue') return 'badge-sfp';
+  return 'badge-other';
+}
+
+/* ---- circular anti-clock ---- */
+function buildClockSVG(size){
+  const r = (size-10)/2;
+  const c = size/2;
+  return { size, r, c, circumference: 2*Math.PI*r };
+}
+function renderClock(container, openAtISO, size){
+  size = size || 74;
+  const geo = buildClockSVG(size);
+  container.innerHTML = `
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      <circle cx="${geo.c}" cy="${geo.c}" r="${geo.r}" fill="none" stroke="#EEEAFB" stroke-width="7"/>
+      <circle class="clock-arc" cx="${geo.c}" cy="${geo.c}" r="${geo.r}" fill="none" stroke="#10B981" stroke-width="7"
+        stroke-linecap="round" stroke-dasharray="${geo.circumference}" stroke-dashoffset="0"
+        transform="rotate(-90 ${geo.c} ${geo.c})"/>
+    </svg>
+    <div class="clock-time safe"></div>`;
+  const arc = container.querySelector('.clock-arc');
+  const timeEl = container.querySelector('.clock-time');
+  const DANGER_MS = 2*60*60*1000; // <=2 hours remaining => red, else green
+  function tick(){
+    const openAt = new Date(openAtISO).getTime();
+    const target = openAt + 4*60*60*1000;
+    const remain = target - Date.now();
+    const abs = Math.abs(remain);
+    const h = Math.floor(abs/3600000), m = Math.floor((abs%3600000)/60000), s = Math.floor((abs%60000)/1000);
+    const pad = n=>String(n).padStart(2,'0');
+    const isDanger = remain <= DANGER_MS;
+    if(remain >= 0){
+      const frac = remain/(4*60*60*1000);
+      arc.setAttribute('stroke-dashoffset', geo.circumference*(1-frac));
+      arc.setAttribute('stroke', isDanger ? '#DC2626' : '#10B981');
+      timeEl.textContent = pad(h)+':'+pad(m)+':'+pad(s);
+      timeEl.className = 'clock-time ' + (isDanger ? 'danger' : 'safe');
+    } else {
+      arc.setAttribute('stroke-dashoffset', 0);
+      arc.setAttribute('stroke', '#DC2626');
+      timeEl.textContent = '-'+pad(h)+':'+pad(m)+':'+pad(s);
+      timeEl.className = 'clock-time danger';
+    }
+  }
+  tick();
+  return setInterval(tick, 1000);
+}
+function stopAllClocks(){
+  [newTTClockTimer, detailClockTimer, locClockTimer].forEach(t=>{ if(t) clearInterval(t); });
+  newTTClockTimer = detailClockTimer = locClockTimer = null;
+}
+
+/* ---- render open fault list ---- */
+let listClockTimers = [];
+function renderOpenFaults(){
+  listClockTimers.forEach(t=>clearInterval(t)); listClockTimers = [];
+  const cmpF = document.getElementById('filterCMP').value;
+  const frtF = document.getElementById('filterFRT').value;
+  const ftF = document.getElementById('filterFaultType').value;
+  const isFRTUser = session.role === 'FRT';
+
+  let rows = openFaults.filter(f=>{
+    if(isFRTUser && (f.frt !== session.frt || (session.cmp && f.cmp !== session.cmp))) return false;
+    if(!isFRTUser && cmpF && f.cmp !== cmpF) return false;
+    if(frtF && f.frt !== frtF) return false;
+    if(ftF && f.faultType1 !== ftF) return false;
+    return f.status === 'open';
+  });
+
+  const tbody = document.getElementById('openFaultTbody');
+  tbody.innerHTML = '';
+  document.getElementById('noFaultsMsg').classList.toggle('hidden', rows.length>0);
+
+  rows.forEach(f=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td data-label="TT No."><strong>${f.ttNo}</strong></td>
+      <td data-label="Fault Type"><span class="badge ${faultBadgeClass(f.faultType1)}">${f.faultType1}</span></td>
+      <td data-label="Affected Service"><span class="badge badge-other">${f.faultType2}</span></td>
+      <td data-label="Anti Clock"></td>
+      <td data-label="Action"><button class="action-btn" onclick="openDetail('${f.ttNo}')">Action</button></td>`;
+    tbody.appendChild(tr);
+    const clockCell = tr.children[3];
+    const clockDiv = document.createElement('div'); clockDiv.className='clock-wrap';
+    clockCell.appendChild(clockDiv);
+    listClockTimers.push(renderClock(clockDiv, f.openAt, 54));
+  });
+}
+
+/* ================= ADD NEW TT ================= */
+function openAddTTModal(){
+  document.getElementById('addTTModal').classList.add('show');
+  const now = new Date();
+  document.getElementById('newOpenDate').value = localDateInputValue(now);
+  document.getElementById('newOpenTime').value = localTimeInputValue(now);
+  onNewSupervisorChange();
+  refreshNewTTClock();
+  document.getElementById('newOpenDate').oninput = refreshNewTTClock;
+  document.getElementById('newOpenTime').oninput = refreshNewTTClock;
+}
+function refreshNewTTClock(){
+  if(newTTClockTimer) clearInterval(newTTClockTimer);
+  const d = document.getElementById('newOpenDate').value;
+  const t = document.getElementById('newOpenTime').value || '00:00:00';
+  const iso = d ? new Date(d+'T'+t).toISOString() : new Date().toISOString();
+  newTTClockTimer = renderClock(document.getElementById('newTTClockWrap'), iso, 58);
+}
+function closeAddTTModal(){
+  acHide();
+  document.getElementById('addTTModal').classList.remove('show');
+  if(newTTClockTimer) clearInterval(newTTClockTimer);
+}
+function processNewTT(){
+  const cmp = document.getElementById('newCMP').value;
+  const ttNoDigits = document.getElementById('newTTNo').value;
+  const link = document.getElementById('newLinkName').value.trim();
+  const span = document.getElementById('newSpanName').value.trim();
+  const affected = document.getElementById('newAffectedService').value;
+  const date = document.getElementById('newOpenDate').value;
+  const time = document.getElementById('newOpenTime').value;
+  const engineer = document.getElementById('newEngineer').value;
+  const supervisor = document.getElementById('newSupervisor').value;
+  const frt = document.getElementById('newFRTName').value;
+  const faultType1 = document.getElementById('newFaultType').value;
+  const woNo = document.getElementById('newWONo').value;
+
+  if(!affected){ toast('Affected Service select karna zaroori hai.','err'); return; }
+  if(!cmp||ttNoDigits.length!==9||!link||!span||!date||!time||!engineer||!supervisor||!frt||!faultType1||woNo.length!==12){
+    toast('Please fill all fields correctly (TT No = 9 digits, WO No = 12 digits).','err');
+    return;
+  }
+  const ttNo = 'IM'+ttNoDigits;
+  if(openFaults.some(f=>f.ttNo===ttNo)){ toast('TT No already exists.','err'); return; }
+  const tt = {
+    ttNo, cmp, link, span, openAt: new Date(date+'T'+time).toISOString(),
+    engineer, supervisor, frt, faultType1, faultType2:affected, woNo,
+    fipRepeat:0, linkRepeat:1, status:'open'
+  };
+  const btn = document.getElementById('processTTBtn');
+  btn.disabled = true; btn.textContent = '⏳ Saving...';
+  callServer('saveNewTT', { ttNo, fields: faultToFields_(tt), by: whoAmI_() }).then(res=>{
+    if(!res || !res.ok){ toast((res && res.error) || 'Save failed.','err'); return; }
+    openFaults.push(tt);
+    saveTTCache();
+    toast('TT saved in Verification sheet & assigned to '+frt,'ok');
+    closeAddTTModal();
+    ['newTTNo','newLinkName','newSpanName','newWONo'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('newFaultType').value='';
+    document.getElementById('newAffectedService').value='';
+    renderOpenFaults();
+    loadTTData();
+  }).catch(err=> toast('Server error: ' + err.message,'err'))
+    .finally(()=>{ btn.disabled = false; btn.textContent = '⚙️ Process'; });
+}
+
+/* ================= FAULT DETAIL PAGE ================= */
+function openDetail(ttNo){
+  currentDetailTT = openFaults.find(f=>f.ttNo===ttNo);
+  if(!currentDetailTT) return;
+  document.getElementById('homePage').classList.add('hidden');
+  document.getElementById('detailPage').classList.remove('hidden');
+  document.getElementById('locPage').classList.add('hidden');
+
+  document.getElementById('detailTTNo').textContent = currentDetailTT.ttNo;
+  document.getElementById('detailRepeatChips').innerHTML =
+    `<span class="repeat-chip">FIP Repeat: ${currentDetailTT.fipRepeat}</span>
+     <span class="repeat-chip">Link Repeat: ${currentDetailTT.linkRepeat}</span>`;
+
+  const grid = document.getElementById('detailInfoGrid');
+  grid.innerHTML = '';
+  const items = [
+    ['CMP', currentDetailTT.cmp], ['Engineer Name', currentDetailTT.engineer],
+    ['Supervisor Name', currentDetailTT.supervisor], ['FRT Name', currentDetailTT.frt],
+    ['Link Name', currentDetailTT.link], ['Span Name', currentDetailTT.span],
+    ['WO No.', currentDetailTT.woNo]
+  ];
+  items.forEach(([lbl,val])=>{
+    grid.insertAdjacentHTML('beforeend', `<div class="info-item"><div class="lbl">${lbl}</div><div class="val">${val}</div></div>`);
+  });
+
+  // Editable Fault Type: FRT/Supervisor may only choose between Fiber Cut / Patch Chord.
+  const limitedRoles = (session.role === 'FRT' || session.role === 'Supervisor');
+  const ftOptions = limitedRoles ? ['Fiber Cut','Patch Chord'] : ['Fiber Cut','Patch Chord','SFP Issue','Others'];
+  fillSelect(document.getElementById('detailFaultTypeSel'), ftOptions, null);
+  document.getElementById('detailFaultTypeSel').value = currentDetailTT.faultType1;
+
+  if(detailClockTimer) clearInterval(detailClockTimer);
+  detailClockTimer = renderClock(document.getElementById('detailClockWrap'), currentDetailTT.openAt, 84);
+
+  refreshDetailActionButton();
+  setPage('detail');
+}
+function refreshDetailActionButton(){
+  const btn = document.getElementById('gotoLocBtn');
+  const ft = currentDetailTT.faultType1;
+  let label, enabled, reason;
+  if(ft === 'Fiber Cut' || ft === 'Patch Chord'){
+    label = '📍 Go To Fault Location';
+    enabled = session.role === 'FRT' && currentDetailTT.frt === session.frt && (!session.cmp || currentDetailTT.cmp === session.cmp);
+    reason = 'Only the assigned FRT user can go to fault location.';
+  } else if(ft === 'SFP Issue'){
+    label = '⚙️ Process / Update';
+    enabled = session.role === 'NOC';
+    reason = 'Only NOC user can process an SFP Issue.';
+  } else { // Others
+    label = '⚙️ Process / Update';
+    enabled = (session.role === 'NOC' || session.role === 'Engineer' || session.role === 'Admin');
+    reason = 'Only NOC / Engineer / Admin can process this.';
+  }
+  btn.textContent = label;
+  btn.disabled = !enabled;
+  btn.title = enabled ? '' : reason;
+}
+/* Fault Type change: INSTANT on screen + localStorage, saved to sheet in background */
+function updateFaultTypeOnDetail(){
+  const newFt = document.getElementById('detailFaultTypeSel').value;
+  if(!newFt || !currentDetailTT) return;
+  const ttNo = currentDetailTT.ttNo;
+  const f = openFaults.find(x=> x.ttNo === ttNo) || currentDetailTT;
+  if(f.faultType1 === newFt){ toast('Fault Type pehle se "'+newFt+'" hai.'); return; }
+  f.faultType1 = newFt;
+  currentDetailTT = f;
+  saveTTCache();
+  ttSig = ttSignature_();
+  outbox.push({ type:'faultType', ttNo, value:newFt, by: whoAmI_(), ts: Date.now() });
+  saveOutbox();
+  refreshDetailActionButton();
+  renderOpenFaults();
+  toast('Fault Type updated to "'+newFt+'".','ok');
+  flushOutbox();                                       // background save to Verification sheet
+}
+
+/* ================= GO TO FAULT LOCATION (FRT) ================= */
+function draftKeyFor(ttNo){ return LS.draftPrefix + ttNo; }
+function emptyDraft(){
+  return { prePhotos:[], postPhotos:[], trayPhotos:[], jcPhotos:[], mhPhotos:[], jpwPhoto:null,
+    preVideo:null, postVideo:null, cbudOn:false, cbudNo:'', cbudSnap:null,
+    ownership:'', faultType3:'', rca:'', delayReason:'', restorationType:'', restorationType1:'',
+    tempFields:{}, firstPreTs:null, firstPostTs:null,
+    pcSiteId:'', pcSiteType:'', pcFaultType:'', pcRoxtec:'', pcDoorAlign:'', pcRooting:'', pcCondition:'', pcBottomPCC:'', pcFdmsSealing:'',
+    pcRoutingPhotos:[], cableEntryPhotos:[], fdmsPhotos:[], bottomPccPhotos:[] };
+}
+let draft = emptyDraft();
+let locMode = 'fiber'; // 'fiber' | 'patch' | 'sfp' | 'others'
+
+function openGoToLocation(){
+  const ft = currentDetailTT.faultType1;
+  locMode = ft === 'Fiber Cut' ? 'fiber' : ft === 'Patch Chord' ? 'patch' : ft === 'SFP Issue' ? 'sfp' : 'others';
+
+  document.getElementById('detailPage').classList.add('hidden');
+  document.getElementById('locPage').classList.remove('hidden');
+  document.getElementById('fiberPatchCard').classList.toggle('hidden', !(locMode==='fiber'||locMode==='patch'));
+  document.getElementById('sfpCard').classList.toggle('hidden', locMode!=='sfp');
+  document.getElementById('othersCard').classList.toggle('hidden', locMode!=='others');
+
+  if(locMode==='fiber' || locMode==='patch'){
+    currentDraftKey = draftKeyFor(currentDetailTT.ttNo);
+    draft = lsGet(currentDraftKey, emptyDraft());
+
+    document.getElementById('locTTNo').textContent = currentDetailTT.ttNo;
+    document.getElementById('locPPRJ').textContent = session.pprj ? ('PPRJ' + session.pprj) : 'PPRJ--------';
+    document.getElementById('locPersonName').textContent = session.name;
+    document.getElementById('locJobRole').textContent = session.jobRole;
+
+    if(locClockTimer) clearInterval(locClockTimer);
+    locClockTimer = renderClock(document.getElementById('locClockWrap'), currentDetailTT.openAt, 84);
+
+    document.getElementById('patchOnlyFieldsBlock').classList.toggle('hidden', locMode!=='patch');
+    document.getElementById('ownershipFieldWrap').classList.toggle('hidden', locMode!=='fiber');
+    document.getElementById('faultType3FieldWrap').classList.toggle('hidden', locMode!=='fiber');
+
+    // restore form fields from draft
+    document.getElementById('ownershipSel').value = draft.ownership || '';
+    fillFaultType3_();
+    document.getElementById('faultType3Sel').value = draft.faultType3 || '';
+    document.getElementById('rcaDetails').value = draft.rca || '';
+    document.getElementById('delayReason').value = draft.delayReason || '';
+    document.getElementById('restorationTypeSel').value = draft.restorationType || '';
+    document.getElementById('restorationType1Sel').value = draft.restorationType1 || '';
+    document.getElementById('cbudToggle').checked = !!draft.cbudOn;
+    document.getElementById('cbudNo').value = draft.cbudNo || '';
+    applyCbudUI_();
+    Object.entries(draft.tempFields||{}).forEach(([k,v])=>{ const el=document.getElementById(k); if(el) el.value=v; });
+    document.getElementById('pcSiteId').value = draft.pcSiteId || '';
+    document.getElementById('pcSiteType').value = draft.pcSiteType || '';
+    document.getElementById('pcFaultTypeSel').value = draft.pcFaultType || '';
+    document.getElementById('pcRoxtec').value = draft.pcRoxtec || '';
+    document.getElementById('pcDoorAlign').value = draft.pcDoorAlign || '';
+    document.getElementById('pcRooting').value = draft.pcRooting || '';
+    document.getElementById('pcCondition').value = draft.pcCondition || '';
+    document.getElementById('pcBottomPCC').value = draft.pcBottomPCC || '';
+    document.getElementById('pcFdmsSealing').value = draft.pcFdmsSealing || '';
+    onSiteTypeChange();
+
+    renderPhotoStrip('prePhotoStrip', draft.prePhotos);
+    renderPhotoStrip('postPhotoStrip', draft.postPhotos);
+    renderPhotoStrip('trayPhotoStrip', draft.trayPhotos);
+    renderPhotoStrip('jcPhotoStrip', draft.jcPhotos);
+    renderPhotoStrip('mhPhotoStrip', draft.mhPhotos);
+    renderPhotoStrip('pcRoutingPhotoStrip', draft.pcRoutingPhotos);
+    renderPhotoStrip('cableEntryPhotoStrip', draft.cableEntryPhotos);
+    renderPhotoStrip('fdmsPhotoStrip', draft.fdmsPhotos);
+    renderPhotoStrip('bottomPccPhotoStrip', draft.bottomPccPhotos);
+    renderJPWStrips();
+    renderVideoStrips_();
+    renderPhotoStrip('cbudSnapStrip', draft.cbudSnap ? [draft.cbudSnap] : []);
+
+    onRestorationTypeChange();
+    updateTravelAndRestoreTime();
+    document.getElementById('submitLocBtn').disabled = false;
+
+    refreshChecklist();
+  } else if(locMode==='sfp'){
+    document.getElementById('sfpTTNo').textContent = currentDetailTT.ttNo;
+    document.getElementById('sfpStatusSel').value = '';
+    if(locClockTimer) clearInterval(locClockTimer);
+    locClockTimer = renderClock(document.getElementById('sfpClockWrap'), currentDetailTT.openAt, 84);
+  } else { // others
+    document.getElementById('othersTTNo').textContent = currentDetailTT.ttNo;
+    document.getElementById('otherCategorySel').value = '';
+    document.getElementById('so6No').value = '';
+    document.getElementById('parentTT').value = '';
+    document.getElementById('peNo').value = '';
+    document.getElementById('autoRestoredRCA').value = '';
+    document.getElementById('otherCatAutoRestoredOpt').classList.toggle('hidden', session.role==='Engineer');
+    onOtherCategoryChange();
+    if(locClockTimer) clearInterval(locClockTimer);
+    locClockTimer = renderClock(document.getElementById('othersClockWrap'), currentDetailTT.openAt, 84);
+  }
+  setPage('loc');
+}
+function backToDetailFromLoc(){
+  document.getElementById('locPage').classList.add('hidden');
+  document.getElementById('detailPage').classList.remove('hidden');
+  setPage('detail');
+}
+function saveDraft(){
+  draft.ownership = document.getElementById('ownershipSel').value;
+  draft.faultType3 = document.getElementById('faultType3Sel').value;
+  draft.rca = document.getElementById('rcaDetails').value;
+  draft.delayReason = document.getElementById('delayReason').value;
+  draft.restorationType = document.getElementById('restorationTypeSel').value;
+  draft.restorationType1 = document.getElementById('restorationType1Sel').value;
+  draft.cbudOn = locMode === 'fiber' && document.getElementById('cbudToggle').checked;
+  draft.cbudNo = document.getElementById('cbudNo').value.trim();
+  draft.tempFields = {};
+  ['fldTD','fldA2UG','fldJC','fldAerial','fldPCC','fldMH','fldSafeguard','fldTrayRemove'].forEach(id=>{
+    const el = document.getElementById(id); if(el) draft.tempFields[id]=el.value;
+  });
+  draft.pcSiteId = document.getElementById('pcSiteId').value;
+  draft.pcSiteType = document.getElementById('pcSiteType').value;
+  draft.pcFaultType = document.getElementById('pcFaultTypeSel').value;
+  draft.pcRoxtec = document.getElementById('pcRoxtec').value;
+  draft.pcDoorAlign = document.getElementById('pcDoorAlign').value;
+  draft.pcRooting = document.getElementById('pcRooting').value;
+  draft.pcCondition = document.getElementById('pcCondition').value;
+  draft.pcBottomPCC = document.getElementById('pcBottomPCC').value;
+  draft.pcFdmsSealing = document.getElementById('pcFdmsSealing').value;
+  if(currentDraftKey) lsSet(currentDraftKey, draft);
+  refreshChecklist();
+}
+function onSiteTypeChange(){
+  const isGBM = document.getElementById('pcSiteType').value === 'GBM';
+  document.getElementById('pcBottomPCCWrap').classList.toggle('hidden', !isGBM);
+  document.getElementById('bottomPccPhotoBlock').classList.toggle('hidden', !isGBM);
+  saveDraft();
+}
+function onRestorationTypeChange(){
+  const val = document.getElementById('restorationTypeSel').value;
+  document.getElementById('tempFieldsBlockFiber').classList.toggle('hidden', !(locMode==='fiber' && val==='Temporary'));
+  document.getElementById('permFieldsBlockFiber').classList.toggle('hidden', !(locMode==='fiber' && val==='Permanent'));
+  document.getElementById('tempFieldsBlockPatch').classList.toggle('hidden', !(locMode==='patch' && val==='Temporary'));
+  document.getElementById('permFieldsBlockPatch').classList.toggle('hidden', !(locMode==='patch' && val==='Permanent'));
+  document.getElementById('jpwBlock').classList.toggle('hidden', !val);
+  saveDraft();
+}
+function updateTravelAndRestoreTime(){
+  const openAt = new Date(currentDetailTT.openAt).getTime();
+  function fmt(msDiff, withSeconds){
+    const abs = Math.max(0, msDiff);
+    const h = Math.floor(abs/3600000), m = Math.floor((abs%3600000)/60000), s = Math.floor((abs%60000)/1000);
+    const pad = n=>String(n).padStart(2,'0');
+    return withSeconds ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(h)}:${pad(m)}`;
+  }
+  if(draft.firstPreTs){
+    document.getElementById('travelTimeVal').textContent = fmt(draft.firstPreTs - openAt, true);
+  } else {
+    document.getElementById('travelTimeVal').textContent = '--:--:--';
+  }
+  if(draft.firstPostTs){
+    const restoreMs = draft.firstPostTs - openAt;
+    document.getElementById('restoreTimeVal').value = fmt(restoreMs, false);
+    const overFourHrs = restoreMs >= 4*60*60*1000;
+    document.getElementById('delayReasonBlock').classList.toggle('hidden', !overFourHrs);
+  } else {
+    document.getElementById('restoreTimeVal').value = '--:--';
+    document.getElementById('delayReasonBlock').classList.add('hidden');
+  }
+}
+
+/* ================= PHOTO CAPTURE =================
+   Mobile  : native camera app (<input capture>).
+   Desktop : LIVE webcam inside the page (camera modal).
+   Every photo gets date-time + Lat/Lon stamp. */
+const PHOTO_TARGETS = { pre:'prePhotos', post:'postPhotos', tray:'trayPhotos', jc:'jcPhotos', mh:'mhPhotos',
+  pcrouting:'pcRoutingPhotos', cableentry:'cableEntryPhotos', fdms:'fdmsPhotos', bottompcc:'bottomPccPhotos' };
+const PHOTO_STRIPS = { pre:'prePhotoStrip', post:'postPhotoStrip', tray:'trayPhotoStrip', jc:'jcPhotoStrip', mh:'mhPhotoStrip',
+  pcrouting:'pcRoutingPhotoStrip', cableentry:'cableEntryPhotoStrip', fdms:'fdmsPhotoStrip', bottompcc:'bottomPccPhotoStrip' };
+
+function getGeo_(){
+  return new Promise(resolve=>{
+    if(!navigator.geolocation) return resolve('Lat/Lon: N/A');
+    navigator.geolocation.getCurrentPosition(
+      pos=> resolve(`Lat ${pos.coords.latitude.toFixed(5)}, Lon ${pos.coords.longitude.toFixed(5)}`),
+      ()=> resolve('Lat/Lon: N/A'),
+      { enableHighAccuracy:true, timeout:6000 }
+    );
+  });
+}
+/* image dataURL -> resized + stamped photo, added to draft */
+async function addCapturedPhoto_(srcDataUrl, target){
+  const geoStr = await getGeo_();
+  const img = await new Promise((res, rej)=>{ const im = new Image(); im.onload = ()=>res(im); im.onerror = rej; im.src = srcDataUrl; });
+  const canvas = document.getElementById('camCanvas');
+  const MAXD = 1600;                                   // resize -> faster upload, smaller storage
+  const sc = Math.min(1, MAXD / Math.max(img.width, img.height));
+  canvas.width = Math.round(img.width * sc); canvas.height = Math.round(img.height * sc);
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const now = new Date();
+  const stamp = now.toLocaleString();
+  ctx.font = Math.round(canvas.width*0.032)+'px sans-serif';
+  const pad = 14, lines = [stamp, geoStr], lh = Math.round(canvas.width*0.04);
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(0, canvas.height - lh*lines.length - pad, canvas.width, lh*lines.length + pad);
+  ctx.fillStyle = '#fff';
+  lines.forEach((ln,i)=>{ ctx.fillText(ln, pad, canvas.height - pad - (lines.length-1-i)*lh - lh*0.3); });
+  const photoObj = { dataUrl: canvas.toDataURL('image/jpeg', 0.72), ts: now.getTime(), tsLabel: stamp, geo: geoStr };
+  const key = PHOTO_TARGETS[target];
+  if(!key) return;
+  if(!draft[key]) draft[key] = [];
+  draft[key].push(photoObj);
+  if(key==='prePhotos' && !draft.firstPreTs) draft.firstPreTs = now.getTime();
+  if(key==='postPhotos' && !draft.firstPostTs) draft.firstPostTs = now.getTime();
+  renderPhotoStrip(PHOTO_STRIPS[target], draft[key]);
+  if(currentDraftKey) lsSet(currentDraftKey, draft);
+  updateTravelAndRestoreTime();
+  refreshChecklist();
+  toast('Photo captured.','ok');
+}
+function handleCaptureInput(evt, target){
+  const file = evt.target.files[0];
+  evt.target.value = '';
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=> addCapturedPhoto_(e.target.result, target);
+  reader.readAsDataURL(file);
+}
+/* ================= LIVE CAMERA (photo) + FORCED 20 SEC VIDEO =================
+   GitHub Pages: camera opens INSIDE the page (mobile + laptop/desktop). No upload option.
+   Permission blocked -> permission popup / steps + retry.
+   Apps Script link: Google blocks the camera inside its frame -> mobile uses phone camera app. */
+const CAN_LIVE_CAMERA = !IN_APPS_SCRIPT && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+const CAM = { stream:null, mode:'photo', target:'', facing:'environment', rec:null, chunks:[], tick:null, stopAt:0, cancelled:false };
+function camEl_(id){ return document.getElementById(id); }
+async function openCamera_(mode, target){
+  CAM.mode = mode; CAM.target = target;
+  camEl_('camTitle').textContent = mode === 'video'
+    ? (target === 'preVideo' ? '🎥 Pre Video — 20 sec' : '🎥 Post Video — 20 sec') : '📷 Camera';
+  camEl_('camShotBtn').classList.toggle('hidden', mode !== 'photo');
+  camEl_('camStopBtn').classList.add('hidden');
+  camEl_('camRetryBtn').classList.add('hidden');
+  camEl_('camSwitchBtn').classList.toggle('hidden', mode === 'video');
+  camEl_('camBadge').classList.remove('on');
+  camEl_('camMsg').classList.add('hidden');
+  camEl_('camModal').classList.add('show');
+  const ok = await startStream_();
+  if(ok && mode === 'video') startVideoRecording_();          // recording starts immediately
+}
+async function startStream_(){
+  stopStream_();
+  const isVid = CAM.mode === 'video';
+  const vc = { facingMode:{ ideal: CAM.facing }, width:{ ideal: isVid ? 640 : 1600 }, height:{ ideal: isVid ? 480 : 1200 } };
+  try{
+    try{ CAM.stream = await navigator.mediaDevices.getUserMedia({ video: vc, audio: isVid }); }   // browser shows permission popup
+    catch(e){
+      if(!isVid || e.name === 'NotAllowedError' && /video|camera/i.test(e.message||'')) throw e;
+      CAM.stream = await navigator.mediaDevices.getUserMedia({ video: vc, audio: false });       // mic blocked -> video only
+    }
+    const v = camEl_('camVideo');
+    v.srcObject = CAM.stream;
+    await v.play().catch(()=>{});
+    return true;
+  }catch(err){
+    CAM.stream = null;
+    showCameraBlocked_(err);
+    return false;
+  }
+}
+function showCameraBlocked_(err){
+  const name = (err && err.name) || '';
+  let html;
+  if(name === 'NotFoundError' || name === 'OverconstrainedError'){
+    html = '📷 Is device me camera nahi mila.<br>Laptop/desktop me webcam lagayein ya mobile se kholein.';
+  } else {
+    html = '🔒 Camera ki permission block hai.<br><b>Camera on karne ke liye:</b><ol>' +
+      '<li>Address bar me 🔒 (lock) icon par click karein</li>' +
+      '<li><b>Camera</b> (aur Microphone) ko <b>Allow</b> karein</li>' +
+      '<li>Neeche <b>“Allow Camera &amp; Retry”</b> dabayein</li></ol>';
+  }
+  const m = camEl_('camMsg'); m.innerHTML = html; m.classList.remove('hidden');
+  camEl_('camShotBtn').classList.add('hidden');
+  camEl_('camRetryBtn').classList.remove('hidden');
+}
+function retryCamera(){ openCamera_(CAM.mode, CAM.target); }
+function stopStream_(){
+  if(CAM.stream){ CAM.stream.getTracks().forEach(t=> t.stop()); CAM.stream = null; }
+  const v = camEl_('camVideo'); if(v) v.srcObject = null;
+}
+function switchCamera(){ CAM.facing = CAM.facing === 'environment' ? 'user' : 'environment'; startStream_(); }
+function closeCamera(){
+  if(CAM.rec && CAM.rec.state === 'recording'){ CAM.cancelled = true; CAM.rec.stop(); }
+  clearInterval(CAM.tick); CAM.tick = null;
+  stopStream_();
+  camEl_('camModal').classList.remove('show');
+}
+function takeCameraPhoto(){
+  const v = camEl_('camVideo');
+  if(!CAM.stream || !v.videoWidth){ toast('Camera abhi ready nahi hai.','err'); return; }
+  const c = document.createElement('canvas');
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v, 0, 0);
+  const data = c.toDataURL('image/jpeg', 0.92), target = CAM.target;
+  closeCamera();
+  addCapturedPhoto_(data, target);
+}
+function startVideoRecording_(){
+  const mime = pickRecMime_() || '';
+  const opts = { videoBitsPerSecond: 900000, audioBitsPerSecond: 64000 };   // compressed: ~2 MB / 20 sec
+  if(mime) opts.mimeType = mime;
+  try{ CAM.rec = new MediaRecorder(CAM.stream, opts); }catch(e){ CAM.rec = new MediaRecorder(CAM.stream); }
+  CAM.chunks = []; CAM.cancelled = false;
+  const startedAt = Date.now();
+  CAM.rec.ondataavailable = e=>{ if(e.data && e.data.size) CAM.chunks.push(e.data); };
+  CAM.rec.onstop = ()=>{
+    const cancelled = CAM.cancelled, target = CAM.target;
+    const blob = new Blob(CAM.chunks, { type: (CAM.rec.mimeType || mime || 'video/webm') });
+    const secs = Math.min(VIDEO_MAX_SEC, Math.round((Date.now() - startedAt)/1000));
+    clearInterval(CAM.tick); CAM.tick = null;
+    stopStream_();
+    camEl_('camModal').classList.remove('show');            // camera closes automatically
+    if(!cancelled && blob.size) saveRecordedVideo_(target, blob, secs);   // -> upload to Drive
+  };
+  CAM.rec.start(1000);
+  CAM.stopAt = startedAt + VIDEO_MAX_SEC * 1000;
+  camEl_('camBadge').classList.add('on');
+  camEl_('camStopBtn').classList.remove('hidden');
+  const upd = ()=>{
+    const left = Math.max(0, Math.ceil((CAM.stopAt - Date.now())/1000));
+    camEl_('camBadgeTxt').textContent = 'REC ' + left + 's';
+    if(left <= 0) stopVideoRecording();                     // FORCED stop at 20 sec
+  };
+  upd();
+  CAM.tick = setInterval(upd, 200);
+}
+function stopVideoRecording(){ if(CAM.rec && CAM.rec.state === 'recording') CAM.rec.stop(); }
+
+/* Photo button: GitHub Pages -> live camera (no file picker). Apps Script desktop -> blocked message. */
+function wireCaptureButtons_(){
+  document.querySelectorAll('label.cap-btn input[capture]').forEach(inp=>{
+    const m = String(inp.getAttribute('onchange')||'').match(/handleCaptureInput\(event,'(\w+)'\)/);
+    if(!m) return;
+    inp.parentElement.addEventListener('click', e=>{
+      if(CAN_LIVE_CAMERA){ e.preventDefault(); openCamera_('photo', m[1]); return; }
+      if(!isMobileDevice()){ e.preventDefault(); desktopCameraBlocked_(); }   // no upload option on laptop
+      // Apps Script + mobile -> phone camera app opens (native)
+    });
+  });
+}
+function desktopCameraBlocked_(){
+  toast('Laptop/Desktop par camera ke liye portal GitHub link se kholein (Apps Script link me Google camera block karta hai).', 'err');
+}
+
+/* ================= 20 SEC VIDEO (phone camera app) =================
+   Google Apps Script blocks in-page camera access (iframe permission policy),
+   so the button opens the PHONE CAMERA directly in video mode.
+   After recording: first 20 sec are kept and compressed (~2-3 MB), then uploaded to Drive. */
+const VIDEO_MAX_SEC = 20;
+function startVideo(key){
+  if(!currentDetailTT) return;
+  if(CAN_LIVE_CAMERA && window.MediaRecorder){ openCamera_('video', key); return; }   // record starts at once, stops at 20s
+  if(!isMobileDevice()){ desktopCameraBlocked_(); return; }
+  const vi = document.getElementById('videoCaptureInput');
+  vi.dataset.target = key;
+  vi.value = '';
+  vi.click();                                          // opens camera in video mode (mobile)
+}
+function videoDuration_(file){
+  return new Promise(resolve=>{
+    const url = URL.createObjectURL(file);
+    const v = document.createElement('video');
+    v.preload = 'metadata'; v.muted = true;
+    v.onloadedmetadata = ()=>{
+      if(v.duration === Infinity){                       // some phones: force real duration
+        v.currentTime = 1e9;
+        v.ontimeupdate = ()=>{ v.ontimeupdate = null; URL.revokeObjectURL(url); resolve(v.duration); };
+      } else { URL.revokeObjectURL(url); resolve(v.duration || 0); }
+    };
+    v.onerror = ()=>{ URL.revokeObjectURL(url); resolve(0); };
+    v.src = url;
+  });
+}
+function pickRecMime_(){
+  if(!window.MediaRecorder) return null;
+  const list = ['video/webm;codecs=vp8,opus', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4;codecs=avc1', 'video/mp4'];
+  for(const m of list){ try{ if(MediaRecorder.isTypeSupported(m)) return m; }catch(e){} }
+  return '';
+}
+/* Re-encode: keeps only first 20 sec, 640px wide, ~900 kbps (plays the clip once, takes <= 20 sec) */
+function compressVideo_(file, maxSec, onTick){
+  return new Promise((resolve, reject)=>{
+    const mime = pickRecMime_();
+    if(mime === null){ reject(new Error('compress not supported')); return; }
+    const url = URL.createObjectURL(file);
+    const v = document.createElement('video');
+    v.src = url; v.muted = true; v.playsInline = true; v.setAttribute('playsinline', '');
+    v.style.cssText = 'position:fixed;left:-9999px;top:0;width:2px;height:2px;';
+    document.body.appendChild(v);
+    const cleanup = ()=>{ try{ v.pause(); }catch(e){} v.remove(); URL.revokeObjectURL(url); };
+    v.onerror = ()=>{ cleanup(); reject(new Error('video read error')); };
+    v.onloadedmetadata = async ()=>{
+      try{
+        const W = Math.min(640, v.videoWidth || 640);
+        const H = Math.round(W * ((v.videoHeight || 480) / (v.videoWidth || 640)));
+        const c = document.createElement('canvas'); c.width = W; c.height = H;
+        const ctx = c.getContext('2d');
+        const stream = c.captureStream(25);
+        try{                                             // keep sound when the browser allows it
+          const src = v.captureStream ? v.captureStream() : (v.mozCaptureStream ? v.mozCaptureStream() : null);
+          if(src) src.getAudioTracks().forEach(t=> stream.addTrack(t));
+        }catch(e){}
+        const opts = { videoBitsPerSecond: 900000, audioBitsPerSecond: 64000 };
+        if(mime) opts.mimeType = mime;
+        let rec; try{ rec = new MediaRecorder(stream, opts); }catch(e){ rec = new MediaRecorder(stream); }
+        const chunks = [];
+        rec.ondataavailable = e=>{ if(e.data && e.data.size) chunks.push(e.data); };
+        rec.onstop = ()=>{ cleanup(); resolve(new Blob(chunks, { type: rec.mimeType || mime || 'video/webm' })); };
+        let raf = 0, stopped = false;
+        const stop = ()=>{ if(stopped) return; stopped = true; cancelAnimationFrame(raf); if(rec.state === 'recording') rec.stop(); };
+        const draw = ()=>{
+          ctx.drawImage(v, 0, 0, W, H);
+          if(onTick) onTick(Math.min(maxSec, Math.floor(v.currentTime)));
+          if(v.currentTime >= maxSec || v.ended) { stop(); return; }
+          raf = requestAnimationFrame(draw);
+        };
+        v.onended = stop;
+        rec.start(1000);
+        await v.play();
+        draw();
+        setTimeout(stop, (maxSec + 3) * 1000);           // safety
+      }catch(err){ cleanup(); reject(err); }
+    };
+  });
+}
+async function handleVideoInput(evt){
+  const file = evt.target.files[0];
+  const target = evt.target.dataset.target;
+  evt.target.value = '';
+  if(!file || !target || !currentDetailTT) return;
+  const label = target === 'preVideo' ? 'Pre' : 'Post';
+  const dur = await videoDuration_(file);
+  const now = new Date();
+  draft[target] = { kind:'video', full:'', ts: now.getTime(), tsLabel: now.toLocaleString(),
+    secs: Math.min(VIDEO_MAX_SEC, Math.round(dur || 0)), ext:'webm', status:'processing' };
+  renderVideoStrips_();
+  let blob = file;
+  const small = file.size <= 8 * 1024 * 1024 && dur > 0 && dur <= VIDEO_MAX_SEC + 1;
+  if(!small){
+    toast(label + ' Video: pehle 20 sec rakhe ja rahe hain aur size chhota ho raha hai...', 'ok');
+    try{
+      blob = await compressVideo_(file, VIDEO_MAX_SEC, sec=>{
+        const el = document.querySelector('#' + target + 'Strip .vstat');
+        if(el) el.textContent = '⏳ Processing ' + sec + '/' + Math.min(VIDEO_MAX_SEC, Math.round(dur || VIDEO_MAX_SEC)) + 's';
+      });
+    }catch(err){
+      if(dur > VIDEO_MAX_SEC + 1 || file.size > 40 * 1024 * 1024){
+        draft[target] = null; renderVideoStrips_();
+        toast('Is phone par video chhota nahi ho paya. Pls 20 second se chhota video record karein.', 'err');
+        return;
+      }
+      blob = file;                                       // short clip -> upload original
+    }
+  }
+  saveRecordedVideo_(target, blob, Math.min(VIDEO_MAX_SEC, Math.round(dur || 0)));
+}
+
+/* Recorded video -> uploaded to Drive right away (in background); link saved in draft */
+const VIDEO_LOCAL = {};      // key -> { blobUrl, dataUrl, promise }  (memory only, not localStorage)
+function videoKey_(ttNo, k){ return ttNo + '|' + k; }
+function blobToDataUrl_(blob){
+  return new Promise((res, rej)=>{ const r = new FileReader(); r.onload = ()=> res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
+}
+async function saveRecordedVideo_(target, blob, secs){
+  const ttNo = currentDetailTT.ttNo;
+  const vk = videoKey_(ttNo, target);
+  const sub = String(blob.type || '').split(';')[0].split('/')[1] || 'webm';
+  const ext = sub === 'quicktime' ? 'mov' : (sub === '3gpp' ? '3gp' : sub);
+  const now = new Date();
+  draft[target] = { kind:'video', full:'', ts: now.getTime(), tsLabel: now.toLocaleString(), secs, ext, status:'uploading' };
+  const local = VIDEO_LOCAL[vk] = { blobUrl: URL.createObjectURL(blob), dataUrl: null, promise: null };
+  if(currentDraftKey) lsSet(currentDraftKey, draft);
+  renderVideoStrips_();
+  toast('Video recorded (' + secs + 's) — Drive par upload ho raha hai...','ok');
+  local.dataUrl = await blobToDataUrl_(blob);
+  local.promise = uploadVideo_(ttNo, target, local.dataUrl, ext);
+  try{ await local.promise; }catch(e){}
+}
+async function uploadVideo_(ttNo, target, dataUrl, ext){
+  const fr = await callServer('prepareTTFolder', { ttNo });
+  if(!fr || !fr.ok) throw new Error((fr && fr.error) || 'Drive folder error');
+  let res = null;
+  for(let t = 0; t < 2 && !(res && res.ok); t++){
+    try{ res = await callServer('uploadPhoto', { ttNo, folderId: fr.folderId, dataUrl, fileName: ttNo + '_' + target + '.' + ext }); }
+    catch(e){ res = { ok:false, error:e.message }; }
+  }
+  const d = (currentDetailTT && currentDetailTT.ttNo === ttNo) ? draft : lsGet(draftKeyFor(ttNo), null);
+  if(res && res.ok){
+    if(d && d[target]){ d[target].full = res.url; d[target].status = 'uploaded'; }
+    if(d === draft){ if(currentDraftKey) lsSet(currentDraftKey, draft); renderVideoStrips_(); }
+    else if(d){ lsSet(draftKeyFor(ttNo), d); }
+    toast((target === 'preVideo' ? 'Pre' : 'Post') + ' Video Drive par upload ho gaya ✔','ok');
+    return res.url;
+  }
+  if(d && d[target]) d[target].status = 'failed';
+  if(d === draft){ if(currentDraftKey) lsSet(currentDraftKey, draft); renderVideoStrips_(); }
+  throw new Error((res && res.error) || 'Video upload failed');
+}
+/* Used at Submit: returns the Drive link (waits / retries if needed) */
+async function ensureVideoUploaded_(ttNo, k, vobj){
+  if(vobj.full) return vobj.full;
+  const local = VIDEO_LOCAL[videoKey_(ttNo, k)];
+  if(local && local.promise){
+    try{ const u = await local.promise; if(u){ vobj.full = u; return u; } }catch(e){}
+  }
+  if(local && local.dataUrl){
+    local.promise = uploadVideo_(ttNo, k, local.dataUrl, vobj.ext || 'webm');
+    const u = await local.promise; vobj.full = u; return u;
+  }
+  throw new Error((k === 'preVideo' ? 'Pre' : 'Post') + ' Video upload nahi hua — video hata kar dobara record karein.');
+}
+function driveFileId_(url){ return driveId_(url); }
+function renderVideoStrips_(){
+  ['preVideo','postVideo'].forEach(k=>{
+    const host = document.getElementById(k + 'Strip');
+    if(!host) return;
+    const v = draft[k];
+    if(!v){ host.innerHTML = ''; return; }
+    const local = currentDetailTT ? VIDEO_LOCAL[videoKey_(currentDetailTT.ttNo, k)] : null;
+    const status = v.full ? '✅ Drive par upload ho gaya' : (v.status === 'failed' ? '⚠️ Upload fail — Submit par dobara try hoga'
+      : (v.status === 'processing' ? '⏳ Processing...' : '⏳ Uploading...'));
+    let player = '';
+    if(v.status === 'processing') player = `<video controls playsinline></video>`;
+    else if(local && local.blobUrl) player = `<video src="${local.blobUrl}" controls playsinline></video>`;
+    else if(v.full) player = `<iframe src="https://drive.google.com/file/d/${driveFileId_(v.full)}/preview" allow="autoplay" allowfullscreen></iframe>`;
+    host.innerHTML = `<div class="video-thumb">${player}
+      <div class="meta">🎥 ${k === 'preVideo' ? 'Pre' : 'Post'} Video ${v.secs ? '('+v.secs+'s)' : ''} · ${v.tsLabel||''}<br><span class="vstat">${status}</span></div>
+      <button class="rm" onclick="removeVideo('${k}')">✕</button></div>`;
+  });
+}
+function removeVideo(k){
+  draft[k] = null;
+  if(currentDetailTT) delete VIDEO_LOCAL[videoKey_(currentDetailTT.ttNo, k)];
+  if(currentDraftKey) lsSet(currentDraftKey, draft);
+  renderVideoStrips_();
+}
+
+/* ================= SITE ID search + SITE TYPE auto-fill (Support H / I / J) ================= */
+function siteRows_(){ return (REF.siteRows || []).map(r=> Array.isArray(r) ? { cmp:r[0]||'', site:r[1]||'', type:r[2]||'' } : r); }
+let siteCache = { key:'', list:[], typeOf:{} };
+function siteSource_(){
+  const cmp = String((currentDetailTT && currentDetailTT.cmp) || '').toLowerCase();
+  const key = cmp + '|' + (REF.siteRows || []).length;
+  if(siteCache.key !== key){
+    const rows = siteRows_();
+    let mine = rows.filter(r=> !cmp || !r.cmp || r.cmp.toLowerCase() === cmp);
+    if(!mine.length) mine = rows;                       // CMP not found in Support -> all sites
+    const seen = {}, list = [], typeOf = {};
+    mine.forEach(r=>{ if(r.site && !seen[r.site]){ seen[r.site] = 1; list.push(r.site); } });
+    rows.forEach(r=>{ if(r.site && r.type && !typeOf[r.site.toUpperCase()]) typeOf[r.site.toUpperCase()] = r.type; });
+    siteCache = { key, list, typeOf };
+  }
+  return siteCache.list;
+}
+/* Sheet value "RTT" / "RTP" -> dropdown option "RTT / RTP"; unknown type is added as a new option */
+function setSiteType_(type){
+  const sel = document.getElementById('pcSiteType');
+  type = String(type||'').trim();
+  if(!type) return;
+  const opts = Array.from(sel.options).map(o=> o.value);
+  let val = opts.find(o=> o.toLowerCase() === type.toLowerCase());
+  if(!val) val = opts.find(o=> o.split('/').map(x=> x.trim().toLowerCase()).includes(type.toLowerCase()));
+  if(!val){ const o = document.createElement('option'); o.value = o.textContent = type; sel.appendChild(o); val = type; }
+  sel.value = val;
+  onSiteTypeChange();                                    // GBM -> Bottom PCC fields etc. + saveDraft
+}
+function onSiteIdPicked_(site){
+  siteSource_();
+  const t = siteCache.typeOf[String(site||'').trim().toUpperCase()];
+  if(t){ setSiteType_(t); toast('Site Type auto-filled: ' + t, 'ok'); }
+  saveDraft();
+}
+
+/* FRT "Fault Type" dropdown = Support sheet Column P (Fault Type List) */
+function fillFaultType3_(){
+  const sel = document.getElementById('faultType3Sel');
+  const list = (REF.faultTypes && REF.faultTypes.length) ? REF.faultTypes : null;
+  if(!list) return;                                   // keep built-in options until sheet list arrives
+  const cur = sel.value || (draft && draft.faultType3) || '';
+  fillSelect(sel, list, 'Select Fault Type');
+  if(cur && !list.includes(cur)){ const o = document.createElement('option'); o.value = cur; o.textContent = cur; sel.appendChild(o); }
+  sel.value = cur;
+}
+
+/* ================= CBUD (if applicable) ================= */
+function applyCbudUI_(){
+  const fiber = locMode === 'fiber';                           // CBUD only when Fault Type = Fiber Cut
+  document.getElementById('cbudToggleWrap').classList.toggle('hidden', !fiber);
+  const on = fiber && document.getElementById('cbudToggle').checked;
+  document.getElementById('cbudState').textContent = on ? 'Yes' : 'No';
+  document.getElementById('cbudState').style.color = on ? '#0284C7' : '#64748B';
+  document.getElementById('cbudNoWrap').classList.toggle('hidden', !on);
+  document.getElementById('cbudSnapWrap').classList.toggle('hidden', !on);
+}
+function onCbudToggle(){ applyCbudUI_(); saveDraft(); }
+function uploadCbudSnap(evt){
+  const file = evt.target.files[0];
+  evt.target.value = '';
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async e=>{
+    // resize big screenshots a bit (faster upload)
+    const img = await new Promise(res=>{ const im = new Image(); im.onload = ()=>res(im); im.src = e.target.result; });
+    const c = document.createElement('canvas');
+    const sc = Math.min(1, 1600 / Math.max(img.width, img.height));
+    c.width = Math.round(img.width*sc); c.height = Math.round(img.height*sc);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    draft.cbudSnap = { dataUrl: c.toDataURL('image/jpeg', 0.8), ts: Date.now(), tsLabel: new Date().toLocaleString() };
+    if(currentDraftKey) lsSet(currentDraftKey, draft);
+    renderPhotoStrip('cbudSnapStrip', [draft.cbudSnap]);
+    refreshChecklist();
+  };
+  reader.readAsDataURL(file);
+}
+
+function uploadJPW(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    draft.jpwPhoto = { dataUrl:e.target.result, ts:Date.now(), tsLabel:new Date().toLocaleString() };
+    if(currentDraftKey) lsSet(currentDraftKey, draft);
+    renderJPWStrips();
+    refreshChecklist();
+  };
+  reader.readAsDataURL(file);
+}
+function renderJPWStrips(){
+  renderPhotoStrip('jpwPhotoStrip', draft.jpwPhoto ? [draft.jpwPhoto] : []);
+}
+function renderPhotoStrip(elId, photos){
+  const host = document.getElementById(elId);
+  host.innerHTML = '';
+  (photos||[]).forEach((p,idx)=>{
+    const div = document.createElement('div'); div.className='photo-thumb';
+    div.innerHTML = `<img src="${p.dataUrl}"><div class="meta">${p.tsLabel||''}<br>${p.geo||''}</div>
+      <button class="rm" onclick="removePhoto('${elId}',${idx})">✕</button>`;
+    host.appendChild(div);
+  });
+}
+function removePhoto(elId, idx){
+  const map = { prePhotoStrip:'prePhotos', postPhotoStrip:'postPhotos', trayPhotoStrip:'trayPhotos',
+    jcPhotoStrip:'jcPhotos', mhPhotoStrip:'mhPhotos', cbudSnapStrip:'cbudSnap',
+    pcRoutingPhotoStrip:'pcRoutingPhotos', cableEntryPhotoStrip:'cableEntryPhotos', fdmsPhotoStrip:'fdmsPhotos', bottomPccPhotoStrip:'bottomPccPhotos',
+    jpwPhotoStrip:'jpwPhoto' };
+  const key = map[elId];
+  if(key==='jpwPhoto' || key==='cbudSnap'){ draft[key] = null; }
+  else { draft[key].splice(idx,1); }
+  if(currentDraftKey) lsSet(currentDraftKey, draft);
+  if(key==='jpwPhoto'){ renderJPWStrips(); }
+  else if(key==='cbudSnap'){ renderPhotoStrip(elId, []); }
+  else { renderPhotoStrip(elId, draft[key]); }
+  refreshChecklist();
+}
+
+function refreshChecklist(){
+  const preOk = (draft.prePhotos||[]).length>0;
+  const postOk = (draft.postPhotos||[]).length>0;
+  const restTypeOk = !!draft.restorationType && !!draft.restorationType1;
+
+  document.getElementById('chkPre').innerHTML = (preOk?'<span class="ok-mark">✔</span>':'<span class="no-mark">✖</span>')+' Pre photo captured';
+  document.getElementById('chkPost').innerHTML = (postOk?'<span class="ok-mark">✔</span>':'<span class="no-mark">✖</span>')+' Post photo captured';
+  document.getElementById('chkRestType').innerHTML = (restTypeOk?'<span class="ok-mark">✔</span>':'<span class="no-mark">✖</span>')+' Restoration Type 1 & 2 selected';
+  // Submit stays clickable; validateBeforeSubmit() gives a specific toast for whatever is missing.
+}
+
+/* Returns an error message naming the first missing mandatory field, or null if everything is filled. */
+function validateBeforeSubmit(){
+  if((draft.prePhotos||[]).length===0) return 'Pre Photo capture karna zaroori hai.';
+  if((draft.postPhotos||[]).length===0) return 'Post Photo capture karna zaroori hai.';
+
+  if(locMode==='fiber'){
+    if(!draft.ownership) return 'Ownership select karna zaroori hai.';
+    if(!draft.faultType3) return 'Fault Type select karna zaroori hai.';
+  } else { // patch
+    if(!draft.pcSiteId) return 'Site ID fill karna zaroori hai.';
+    if(!draft.pcSiteType) return 'Site Type select karna zaroori hai.';
+    if(!draft.pcFaultType) return 'PC Fault Type select karna zaroori hai.';
+  }
+
+  if(!draft.rca || !draft.rca.trim()) return 'Details / RCA fill karna zaroori hai.';
+
+  const overFourHrs = draft.firstPostTs && (draft.firstPostTs - new Date(currentDetailTT.openAt).getTime()) >= 4*60*60*1000;
+  if(overFourHrs && (!draft.delayReason || !draft.delayReason.trim())) return 'Delay Reason fill karna zaroori hai.';
+
+  if(draft.cbudOn){
+    if(!draft.cbudNo) return 'CBUD Portal Entry No. fill karna zaroori hai.';
+    if(!draft.cbudSnap) return 'CBUD Snap upload karna zaroori hai.';
+  }
+  if(!draft.restorationType1) return 'Restoration Type 1 (Single Joint / Double Joint / Re-spliced) select karna zaroori hai.';
+  if(!draft.restorationType) return 'Restoration Type 2 (Temporary / Permanent) select karna zaroori hai.';
+
+  if(draft.restorationType === 'Temporary'){
+    if(locMode==='fiber'){
+      const fields=[['fldTD','T&D'],['fldA2UG','A2UG'],['fldJC','JC Rehab'],['fldAerial','Aerial Rehab'],
+        ['fldPCC','PCC'],['fldMH','MH Installation'],['fldSafeguard','Safeguarding'],['fldTrayRemove','Tray Remove']];
+      for(const [id,label] of fields){ if(!draft.tempFields[id]) return label+' fill karna zaroori hai.'; }
+    } else {
+      if(!draft.pcRoxtec) return 'Roxtec Sealing select karna zaroori hai.';
+      if(!draft.pcDoorAlign) return 'Door Alignment select karna zaroori hai.';
+      if(!draft.pcRooting) return 'PC Rooting select karna zaroori hai.';
+      if(!draft.pcCondition) return 'PC Condition select karna zaroori hai.';
+      if(draft.pcSiteType==='GBM' && !draft.pcBottomPCC) return 'Bottom PCC select karna zaroori hai.';
+      if(!draft.pcFdmsSealing) return 'FDMS Sealing select karna zaroori hai.';
+    }
+  } else if(draft.restorationType === 'Permanent'){
+    if(locMode==='fiber'){
+      if(!(draft.trayPhotos||[]).length) return 'Tray Photo capture karna zaroori hai.';
+      if(!(draft.jcPhotos||[]).length) return 'JC Photo capture karna zaroori hai.';
+      if(!(draft.mhPhotos||[]).length) return 'MH Photo capture karna zaroori hai.';
+    } else {
+      if(!(draft.pcRoutingPhotos||[]).length) return 'PC Rooting Photo capture karna zaroori hai.';
+      if(!(draft.cableEntryPhotos||[]).length) return 'Cable Entry Photo capture karna zaroori hai.';
+      if(!(draft.fdmsPhotos||[]).length) return 'FDMS Photo capture karna zaroori hai.';
+      if(draft.pcSiteType==='GBM' && !(draft.bottomPccPhotos||[]).length) return 'Bottom PCC Photo capture karna zaroori hai.';
+    }
+  }
+
+  if(!draft.jpwPhoto) return 'TT01 WO Closed in JPW Snap upload karna zaroori hai.';
+  return null;
+}
+
+let frtSubmitting = false;
+async function submitFaultForReview(){
+  if(frtSubmitting) return;
+  saveDraft();
+  const err = validateBeforeSubmit();
+  if(err){ toast(err, 'err'); return; }
+  const tt = currentDetailTT, dr = JSON.parse(JSON.stringify(draft)), key = currentDraftKey;
+  const btn = document.getElementById('submitLocBtn');
+  frtSubmitting = true; btn.disabled = true;
+  try{
+    const urls = await uploadDraftPhotos_(tt.ttNo, dr, (n,t)=>{ btn.textContent = `⏳ Uploading photos ${n}/${t}...`; });
+    if(currentDraftKey === key){ draft = dr; }                      // uploaded links kept -> retry won't re-upload
+    try{ lsSet(key, dr); }catch(e){}
+    btn.textContent = '⏳ Saving...';
+    const res = await callServer('updateTT', { ttNo: tt.ttNo, action:'frtSubmit', fields: draftToFields_(dr, tt, urls), by: whoAmI_() });
+    if(!res || !res.ok){ toast((res && res.error) || 'Submit failed.','err'); if(res && res.stale) loadTTData(); return; }
+    openFaults = openFaults.filter(f=>f.ttNo!==tt.ttNo);
+    saveTTCache();
+    localStorage.removeItem(key);
+    toast('Submitted for Engineer review (Verification sheet updated).','ok');
+    goHome();
+    loadTTData();
+  }catch(e){
+    toast('Submit nahi hua: ' + e.message + ' — form save hai, dobara Submit karein.','err');
+  }finally{
+    frtSubmitting = false; btn.disabled = false; btn.textContent = '✅ Submit';
+  }
+}
+
+/* ================= SFP ISSUE FLOW ================= */
+function closeSfpIssue(){
+  const status = document.getElementById('sfpStatusSel').value;
+  if(status !== 'SFP Issue Closed Confirm by Engineer'){
+    toast('SFP Issue still not Closed', 'err');
+    return;
+  }
+  closeTTDirectly({ sfpStatus: status });
+}
+
+/* ================= OTHERS FLOW ================= */
+function onOtherCategoryChange(){
+  const cat = document.getElementById('otherCategorySel').value;
+  document.getElementById('so6Wrap').classList.toggle('hidden', cat!=='Transport TT');
+  document.getElementById('parentTTWrap').classList.toggle('hidden', cat!=='Associate TT');
+  document.getElementById('peNoWrap').classList.toggle('hidden', cat!=='Under PE');
+  document.getElementById('autoRestoredWrap').classList.toggle('hidden', cat!=='Auto Restored');
+}
+function closeOthersTT(){
+  const cat = document.getElementById('otherCategorySel').value;
+  if(!cat){ toast('Other Category select karna zaroori hai.', 'err'); return; }
+
+  if(cat === 'Auto Restored' && session.role === 'Engineer'){
+    toast('Auto Restored is only available for NOC / Admin.', 'err');
+    return;
+  }
+
+  let extra = { otherCategory: cat };
+  if(cat === 'Transport TT'){
+    const v = document.getElementById('so6No').value;
+    if(v.length !== 10){ toast('SO6 No Fill Required', 'err'); return; }
+    extra.so6No = v;
+  } else if(cat === 'Associate TT'){
+    const v = document.getElementById('parentTT').value;
+    if(v.length !== 9){ toast('Parent TT Fill Required', 'err'); return; }
+    extra.parentTT = 'IM'+v;
+  } else if(cat === 'Under PE'){
+    const v = document.getElementById('peNo').value;
+    if(v.length !== 7){ toast('PE No Fill Required', 'err'); return; }
+    extra.peNo = 'C'+v;
+  } else if(cat === 'Auto Restored'){
+    const v = document.getElementById('autoRestoredRCA').value.trim();
+    if(!v){ toast('Auto Restored RCA Fill Required', 'err'); return; }
+    extra.autoRestoredRCA = v;
+  }
+  closeTTDirectly(extra);
+}
+
+/* Shared: close a TT without going through Engineer review (used by SFP Issue & Others). */
+function closeTTDirectly(extra){
+  const tt = currentDetailTT;
+  const f = {
+    'Other Category': extra.otherCategory || '', 'SO6 No': extra.so6No || '', 'Parent TT': extra.parentTT || '',
+    'PE No': extra.peNo || '', 'Auto Restored RCA': extra.autoRestoredRCA || '', 'SFP Status': extra.sfpStatus || ''
+  };
+  const btns = document.querySelectorAll('#sfpCard .btn-process, #othersCard .btn-process');
+  btns.forEach(b=>{ b.disabled = true; b.dataset.txt = b.textContent; b.textContent = '⏳ Closing...'; });
+  callServer('closeTT', { ttNo: tt.ttNo, fields: f, by: whoAmI_() }).then(res=>{
+    if(!res || !res.ok){ toast((res && res.error) || 'Close failed.','err'); if(res && res.stale) loadTTData(); return; }
+    openFaults = openFaults.filter(x=>x.ttNo!==tt.ttNo);
+    saveTTCache();
+    toast('TT Closed — Database sheet me save ho gaya.', 'ok');
+    goHome();
+    loadTTData();
+  }).catch(err=> toast('Server error: ' + err.message,'err'))
+    .finally(()=> btns.forEach(b=>{ b.disabled = false; b.textContent = b.dataset.txt || '✅ Closed TT'; }));
+}
+
+/* ================= ENGINEER / SUPERVISOR / ADMIN REVIEW ================= */
+function myReviewEntries(){
+  if(!session) return [];
+  if(session.role === 'Admin' || session.role === 'NOC') return reviewQueue.slice();
+  const mine = (label)=>{
+    label = String(label||'');
+    if(!label) return false;
+    if(label === session.name || label.indexOf(session.name + ' (') === 0) return true;
+    return [session.userId1, session.userId2].some(id=> id && label.indexOf('('+id+')') > -1);
+  };
+  if(session.role === 'Engineer') return reviewQueue.filter(r=> mine(r.engineer));
+  if(session.role === 'Supervisor') return reviewQueue.filter(r=> mine(r.supervisor));
+  if(session.role === 'FRT') return reviewQueue.filter(r=> r.frt === session.frt && r.cmp === session.cmp);
+  return [];
+}
+/* Review Submit rights: Admin, or anyone with "Is Approver = Yes" in User sheet */
+function canSubmitReview(){
+  return !!session && (session.role === 'Admin' || session.isApprover === true);
+}
+function updateReviewCount(){
+  if(!session) return;
+  document.getElementById('reviewCount').textContent = myReviewEntries().length;
+}
+function openReviewList(){
+  document.getElementById('homePage').classList.add('hidden');
+  document.getElementById('detailPage').classList.add('hidden');
+  document.getElementById('locPage').classList.add('hidden');
+  document.getElementById('reviewListPage').classList.remove('hidden');
+  const today = localDateInputValue(new Date());
+  document.getElementById('rvFromDate').value = today;
+  document.getElementById('rvToDate').value = today;
+  onFilterCMPChange('rvCMP','rvFRT');
+  renderReviewList();
+  setPage('review');
+}
+function renderReviewList(){
+  const from = document.getElementById('rvFromDate').value;
+  const to = document.getElementById('rvToDate').value;
+  const domain = document.getElementById('rvDomain').value;
+  const cmp = document.getElementById('rvCMP').value;
+  const frt = document.getElementById('rvFRT').value;
+  const ft = document.getElementById('rvFaultType').value;
+
+  let rows = myReviewEntries().filter(r=>{
+    const d = localDateInputValue(new Date(r.submittedAt));
+    if(from && d < from) return false;
+    if(to && d > to) return false;
+    if(domain && r.domain !== domain) return false;
+    if(cmp && r.cmp !== cmp) return false;
+    if(frt && r.frt !== frt) return false;
+    if(ft && r.faultType1 !== ft) return false;
+    return true;
+  });
+
+  const host = document.getElementById('reviewListHost');
+  host.innerHTML = '';
+  document.getElementById('noReviewMsg').classList.toggle('hidden', rows.length>0);
+  const btnLabel = canSubmitReview() ? '🔍 View & Confirm' : '👁️ View';
+  rows.forEach(r=>{
+    const div = document.createElement('div');
+    div.className = 'section-card review-card';
+    div.innerHTML = `
+      <div class="review-card-head">
+        <h4>${r.ttNo} — ${r.faultType1}</h4>
+        <span class="badge badge-other">${new Date(r.submittedAt).toLocaleString()}</span>
+      </div>
+      <div class="info-grid" style="margin-bottom:10px;">
+        <div class="info-item"><div class="lbl">CMP</div><div class="val">${r.cmp}</div></div>
+        <div class="info-item"><div class="lbl">FRT</div><div class="val">${r.frt}</div></div>
+        <div class="info-item"><div class="lbl">Link / Span</div><div class="val">${r.link} / ${r.span}</div></div>
+      </div>
+      <button class="btn-process" onclick="openReviewDetail('${r.id}')">${btnLabel}</button>`;
+    host.appendChild(div);
+  });
+}
+let activeReviewId = null;
+function openReviewDetail(id){
+  activeReviewId = id;
+  const r = reviewQueue.find(x=>x.id===id);
+  document.getElementById('rdTTNo').textContent = r.ttNo + ' — Review';
+  const d = r.draft;
+  function photoGroup(title, photos){
+    if(!photos || !photos.length) return '';
+    return `<div class="photo-block"><div class="photo-block-head"><span class="lbl">${title}</span></div>
+      <div class="photo-strip">${photos.map(p=>`<div class="photo-thumb"><a href="${p.full||p.dataUrl}" target="_blank" rel="noopener"><img src="${p.dataUrl}" referrerpolicy="no-referrer"></a><div class="meta">${p.tsLabel||''}<br>${p.geo||''}</div></div>`).join('')}</div></div>`;
+  }
+  function videoGroup(title, v){
+    if(!v || !v.full) return '';
+    const id = driveId_(v.full);
+    return `<div class="photo-block"><div class="photo-block-head"><span class="lbl">${title}</span>
+        <a class="cap-btn" style="display:inline-flex;text-decoration:none;" href="${v.full}" target="_blank" rel="noopener">↗ Open in Drive</a></div>
+      <div class="video-thumb" style="width:100%;max-width:520px;">
+        <iframe src="https://drive.google.com/file/d/${id}/preview" style="height:290px;" allow="autoplay" allowfullscreen></iframe>
+      </div></div>`;
+  }
+  const body = document.getElementById('reviewDetailBody');
+  body.innerHTML = `
+    <div class="info-grid">
+      <div class="info-item"><div class="lbl">CMP</div><div class="val">${r.cmp}</div></div>
+      <div class="info-item"><div class="lbl">FRT</div><div class="val">${r.frt}</div></div>
+      <div class="info-item"><div class="lbl">Ownership</div><div class="val">${d.ownership||'-'}</div></div>
+      <div class="info-item"><div class="lbl">Fault Type</div><div class="val">${d.faultType3||'-'}</div></div>
+      <div class="info-item"><div class="lbl">Restoration Type 1</div><div class="val">${d.restorationType1||'-'}</div></div>
+      <div class="info-item"><div class="lbl">Restoration Type 2</div><div class="val">${d.restorationType||'-'}</div></div>
+      <div class="info-item"><div class="lbl">CBUD Entry</div><div class="val">${d.cbudOn ? ('Yes — ' + (d.cbudNo||'-')) : 'No'}</div></div>
+      <div class="info-item"><div class="lbl">Travel / Restore Time</div><div class="val">${d.travelTime||'-'} / ${d.restoreTime||'-'}</div></div>
+      ${d.pcSiteId ? `<div class="info-item"><div class="lbl">Site ID / Type</div><div class="val">${d.pcSiteId} / ${d.pcSiteType||'-'}</div></div>` : ''}
+    </div>
+    <div class="field"><label>RCA / Details</label><div class="info-item">${d.rca||'-'}</div></div>
+    ${d.delayReason ? `<div class="field"><label>Delay Reason</label><div class="info-item">${d.delayReason}</div></div>` : ''}
+    ${photoGroup('Pre Photos', d.prePhotos)}
+    ${videoGroup('🎥 Pre Video', d.preVideo)}
+    ${photoGroup('Post Photos', d.postPhotos)}
+    ${videoGroup('🎥 Post Video', d.postVideo)}
+    ${d.cbudOn && d.cbudSnap ? photoGroup('CBUD Snap', [d.cbudSnap]) : ''}
+    ${photoGroup('Tray Photos', d.trayPhotos)}
+    ${photoGroup('JC Photos', d.jcPhotos)}
+    ${photoGroup('MH Photos', d.mhPhotos)}
+    ${photoGroup('PC Rooting Photos', d.pcRoutingPhotos)}
+    ${photoGroup('Cable Entry Photos', d.cableEntryPhotos)}
+    ${photoGroup('FDMS Photos', d.fdmsPhotos)}
+    ${photoGroup('Bottom PCC Photos', d.bottomPccPhotos)}
+    ${d.jpwPhoto ? photoGroup('TT01 WO Closed (JPW)', [d.jpwPhoto]) : ''}
+    ${canSubmitReview() ? `
+    <div class="form-grid" style="margin-top:16px;">
+      <div class="field">
+        <label>📡 RFO Status</label>
+        <select id="rdRFOStatus"><option value="">Select</option><option>RFO Updated</option><option>RFO Not Updated</option></select>
+      </div>
+      <div class="field">
+        <label>🆔 FIP ID</label>
+        <input type="text" id="rdFIPId" placeholder="Enter FIP ID">
+      </div>
+    </div>` : `
+    <div class="note-banner" style="margin-top:16px;">👁️ View-only — sirf apni team ka work track karne ke liye. RFO / Submit sirf Engineer ya Admin kar sakte hain.</div>`}`;
+  document.getElementById('reviewSubmitBtn').classList.toggle('hidden', !canSubmitReview());
+  document.getElementById('reviewDetailModal').classList.add('show');
+}
+function closeReviewDetail(){ document.getElementById('reviewDetailModal').classList.remove('show'); activeReviewId=null; }
+function submitReviewConfirm(){
+  if(!canSubmitReview()) return;
+  const r = reviewQueue.find(x=>x.id===activeReviewId);
+  if(!r) return;
+  const rfo = document.getElementById('rdRFOStatus').value;
+  const fip = document.getElementById('rdFIPId').value.trim();
+  if(rfo === 'RFO Not Updated' || !rfo){
+    toast('Pls update RFO then Submit','err');
+    return;
+  }
+  if(!fip){ toast('FIP ID is mandatory.','err'); return; }
+  const btn = document.getElementById('reviewSubmitBtn');
+  btn.disabled = true; btn.textContent = '⏳ Saving...';
+  callServer('approveReview', { ttNo: r.ttNo, rfoStatus: rfo, fipId: fip, by: whoAmI_() }).then(res=>{
+    if(!res || !res.ok){ toast((res && res.error) || 'Save failed.','err'); if(res && res.stale) loadTTData(); return; }
+    reviewQueue = reviewQueue.filter(x=>x.id!==r.id);
+    saveTTCache();
+    toast('Save Successfully — TT Database sheet me save ho gaya.','ok');
+    closeReviewDetail();
+    renderReviewList();
+    updateReviewCount();
+    loadTTData();
+  }).catch(err=> toast('Server error: ' + err.message,'err'))
+    .finally(()=>{ btn.disabled = false; btn.textContent = '✅ Submit'; });
+}
+
+/* ================= BOOT ================= */
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Enter') return;
+  if(!document.getElementById('loginScreen').classList.contains('hidden')){
+    e.preventDefault(); doLogin();
+  } else if(!document.getElementById('cpScreen').classList.contains('hidden')){
+    e.preventDefault(); doChangePassword();
+  }
+});
+(function boot(){
+  // 1) Instant: show UI from localStorage cache (no loading screen)
+  const cachedRef = lsGet(LS_REF, null);
+  if(cachedRef && cachedRef.data){ REF = Object.assign(REF, cachedRef.data); refLoadedOnce = true; }
+  setLoginMode('FRT');
+  initRefDropdowns();
+  document.getElementById('loginCMP').addEventListener('change', e=>{ e.target.dataset.touched = '1'; fillSavedPassword(); });
+  document.getElementById('loginFRTName').addEventListener('change', fillSavedPassword);
+  wireCaptureButtons_();
+  acInit('newLinkName', linkSource_);
+  acInit('pcSiteId', siteSource_, onSiteIdPicked_);
+  document.getElementById('pcSiteId').addEventListener('change', e=>{     // typed full Site ID by hand
+    siteSource_();
+    if(siteCache.typeOf[e.target.value.trim().toUpperCase()]) onSiteIdPicked_(e.target.value.trim());
+  });
+  acInit('newSpanName', spanSource_);
+  document.getElementById('loginUserId').addEventListener('input', fillSavedPassword);
+  if(session && session.role){ enterApp(); }
+  else { showScreen('login'); }
+  // 2) Background: fetch fresh dropdown data + TT data from Sheet and update silently
+  loadReferenceData();
+  (async ()=>{ await migrateLocalTTs(); await flushOutbox(); loadTTData(); })();
+  // 3) Auto sync every 30 sec — silent, no page reload; screen updates only if data changed
+  setInterval(backgroundSync_, 30000);
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'visible') backgroundSync_(); });
+})();
+</script>
+</body>
+</html>
