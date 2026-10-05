@@ -1197,7 +1197,7 @@ let newTTClockTimer = null, detailClockTimer = null, locClockTimer = null;
    1) Apps Script web app  -> google.script.run
    2) GitHub Pages (index.html) -> fetch() to the Apps Script /exec URL (doPost API in Code.gs)
    On GitHub Pages the in-page LIVE CAMERA works (Apps Script blocks camera inside its frame). */
-const API_URL = 'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE';   // e.g. https://script.google.com/macros/s/AKfy..../exec
+const API_URL = 'https://script.google.com/macros/s/AKfycbyNUyrTtZWtnl9spe1EndfXD61pxNVkWJ4o8rK0vaqfNtlk4y6j0B2Sd-fLPaz0TME/exec';   // e.g. https://script.google.com/macros/s/AKfy..../exec
 const IN_APPS_SCRIPT = !!(window.google && google.script && google.script.run);
 function callServer(fnName, arg){
   if(IN_APPS_SCRIPT){
