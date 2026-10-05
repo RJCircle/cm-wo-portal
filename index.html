@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <title>RJ CM WO Portal</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%A0%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <style>
 :root{
   --purple-1:#6C5CE7;
@@ -397,6 +398,27 @@ table.data-table tr:hover td{background:#FAF9FF;}
 @keyframes rjblink{50%{opacity:.2;}}
 .cam-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:22px;font-weight:600;line-height:1.5;background:rgba(0,0,0,.85);}
 .cam-msg ol{text-align:left;margin:10px 0 0;padding-left:20px;font-weight:500;font-size:.9rem;}
+/* ---- camera / video window = FULL SCREEN (laptop + mobile) ---- */
+#camModal{padding:0 !important;align-items:stretch;justify-content:stretch;background:#000;overflow:hidden;z-index:20000;}
+#camModal .modal-box{max-width:none !important;width:100vw;height:100vh;height:100dvh;border-radius:0;margin:0;
+  display:flex;flex-direction:column;background:#000;box-shadow:none;animation:none;}
+#camModal .modal-head{background:#000;border:0;padding:12px 18px;padding-top:calc(12px + env(safe-area-inset-top));}
+#camModal .modal-head h3{color:#fff;font-size:1.05rem;}
+#camModal .modal-close{color:#fff;font-size:1.6rem;}
+#camModal .modal-body{flex:1;min-height:0;padding:0;display:flex;}
+#camModal .cam-stage{flex:1;width:100%;height:100%;aspect-ratio:auto;border-radius:0;}
+#camModal .cam-stage video{width:100%;height:100%;object-fit:contain;}
+#camModal .cam-badge{top:16px;left:50%;transform:translateX(-50%);font-size:1.1rem;padding:8px 16px;}
+#camModal .modal-foot{background:#000;border:0;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:16px 18px;padding-bottom:calc(18px + env(safe-area-inset-bottom));}
+#camModal .modal-foot .btn-secondary{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.25);}
+#camModal #camShotBtn, #camModal #camStopBtn{min-width:150px;padding:16px 26px;font-size:1.05rem;border-radius:999px;}
+#camModal #camStopBtn{background:linear-gradient(135deg,#EF4444,#B91C1C);}
+@media (max-width:600px){
+  #camModal .modal-foot{gap:10px;}
+  #camModal .modal-foot .btn-secondary{padding:12px 14px;font-size:.85rem;}
+  #camModal #camShotBtn, #camModal #camStopBtn{min-width:0;flex:1 1 100%;order:-1;padding:18px;}
+}
 /* ---- toggle switch (CBUD) ---- */
 .switch-row{display:flex;align-items:center;gap:12px;min-height:48px;}
 .switch{position:relative;width:62px;height:32px;flex:0 0 auto;}
@@ -1210,14 +1232,33 @@ function callServer(fnName, arg){
   if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(API_URL)){
     return Promise.reject(new Error('Index.html me API_URL (Apps Script /exec link) set karein.'));
   }
-  return fetch(API_URL, {
+  // Reads / uploads are retried automatically (Google sometimes loses the reply: echo 404).
+  const RETRY = { getReferenceData:3, getTTData:3, prepareTTFolder:3, loginUser:2, uploadPhoto:3 };
+  const tries = RETRY[fnName] || 1;
+  const once = ()=> fetch(API_URL, {
     method:'POST', redirect:'follow',
     headers:{ 'Content-Type':'text/plain;charset=utf-8' },          // simple request -> no CORS preflight
     body: JSON.stringify({ fn: fnName, arg: arg === undefined ? null : arg })
-  }).then(r=> r.json()).then(j=>{
-    if(j && j.__error) throw new Error(j.__error);
-    return j ? j.result : null;
+  }).then(r=> r.text().then(t=> ({ status: r.status, t })), ()=> ({ status: 0, t: '' }))
+    .then(({ status, t })=>{
+      let j = null;
+      try{ j = JSON.parse(t); }catch(e){}
+      if(!j){
+        console.warn('[API] ' + fnName + ' -> HTTP ' + status + ' (no JSON reply)');
+        const err = new Error(status === 0
+          ? 'API se connect nahi ho paya (net / deployment). Check: ' + API_URL + '?api=ping'
+          : 'Server ka jawab nahi mila (HTTP ' + status + '). Dobara try karein.');
+        err.retryable = true;
+        throw err;
+      }
+      if(j.__error) throw new Error(j.__error);
+      return j.result;
+    });
+  const run = (n)=> once().catch(err=>{
+    if(err.retryable && n > 1) return new Promise(r=> setTimeout(r, 1200)).then(()=> run(n - 1));
+    throw err;
   });
+  return run(tries);
 }
 /* ================= LOCAL CACHE (instant UI) =================
    - REF (dropdown data) cached in localStorage -> page shows instantly,
@@ -1589,7 +1630,7 @@ async function uploadDraftPhotos_(ttNo, dr, onProgress){
         let res = null, tries = 0;
         while(tries < 2){                                           // 1 automatic retry
           tries++;
-          try{ res = await callServer('uploadPhoto', { ttNo, folderId, dataUrl: j.ph.dataUrl, fileName: ttNo + '_' + j.k + '_' + (j.i+1) + '.jpg' }); }
+          try{ res = await callServer('uploadPhoto', { ttNo, folderId, dataUrl: j.ph.dataUrl, fileName: ttNo + '_' + j.k + '_' + (j.i+1) + '_' + (j.ph.ts || 0) + '.jpg' }); }
           catch(e){ res = { ok:false, error:e.message }; }
           if(res && res.ok) break;
         }
@@ -2634,6 +2675,7 @@ async function openCamera_(mode, target){
   camEl_('camBadge').classList.remove('on');
   camEl_('camMsg').classList.add('hidden');
   camEl_('camModal').classList.add('show');
+  enterFullScreen_();
   const ok = await startStream_();
   if(ok && mode === 'video') startVideoRecording_();          // recording starts immediately
 }
@@ -2678,11 +2720,22 @@ function stopStream_(){
   const v = camEl_('camVideo'); if(v) v.srcObject = null;
 }
 function switchCamera(){ CAM.facing = CAM.facing === 'environment' ? 'user' : 'environment'; startStream_(); }
+function enterFullScreen_(){
+  const el = camEl_('camModal');
+  try{
+    const fn = el.requestFullscreen || el.webkitRequestFullscreen;
+    if(fn && !document.fullscreenElement) { const p = fn.call(el); if(p && p.catch) p.catch(()=>{}); }
+  }catch(e){}                                    // not supported (e.g. iPhone) -> CSS full screen is used
+}
+function hideCamModal_(){
+  camEl_('camModal').classList.remove('show');
+  try{ if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{}); }catch(e){}
+}
 function closeCamera(){
   if(CAM.rec && CAM.rec.state === 'recording'){ CAM.cancelled = true; CAM.rec.stop(); }
   clearInterval(CAM.tick); CAM.tick = null;
   stopStream_();
-  camEl_('camModal').classList.remove('show');
+  hideCamModal_();
 }
 function takeCameraPhoto(){
   const v = camEl_('camVideo');
@@ -2708,7 +2761,7 @@ function startVideoRecording_(){
     const secs = Math.min(VIDEO_MAX_SEC, Math.round((Date.now() - startedAt)/1000));
     clearInterval(CAM.tick); CAM.tick = null;
     stopStream_();
-    camEl_('camModal').classList.remove('show');            // camera closes automatically
+    hideCamModal_();            // camera closes automatically
     if(!cancelled && blob.size) saveRecordedVideo_(target, blob, secs);   // -> upload to Drive
   };
   CAM.rec.start(1000);
@@ -2880,7 +2933,8 @@ async function uploadVideo_(ttNo, target, dataUrl, ext){
   if(!fr || !fr.ok) throw new Error((fr && fr.error) || 'Drive folder error');
   let res = null;
   for(let t = 0; t < 2 && !(res && res.ok); t++){
-    try{ res = await callServer('uploadPhoto', { ttNo, folderId: fr.folderId, dataUrl, fileName: ttNo + '_' + target + '.' + ext }); }
+    const vts = (draft && draft[target] && draft[target].ts) || Date.now();
+    try{ res = await callServer('uploadPhoto', { ttNo, folderId: fr.folderId, dataUrl, fileName: ttNo + '_' + target + '_' + vts + '.' + ext }); }
     catch(e){ res = { ok:false, error:e.message }; }
   }
   const d = (currentDetailTT && currentDetailTT.ttNo === ttNo) ? draft : lsGet(draftKeyFor(ttNo), null);
