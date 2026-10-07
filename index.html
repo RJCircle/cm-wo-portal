@@ -205,6 +205,11 @@ input,select,textarea{font-family:inherit;}
   transition:transform .15s ease;
 }
 .header-reset-btn:active{transform:scale(.92);}
+.header-reset-btn{position:relative;}
+.sync-dot{position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;border:2px solid #fff;background:#94A3B8;}
+.sync-dot.ok{background:#22C55E;}
+.sync-dot.busy{background:#F59E0B;}
+.sync-dot.err{background:#EF4444;}
 .header-reset-btn.spinning span{display:inline-block;animation:rjspin .8s linear infinite;}
 @keyframes rjspin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .remember-row{display:flex;align-items:center;gap:8px;margin:-4px 0 14px;font-size:.82rem;font-weight:700;color:#3A3660;cursor:pointer;}
@@ -618,7 +623,7 @@ table.data-table tr:hover td{background:#FAF9FF;}
       <button class="header-back-btn hidden" id="headerBackBtn" onclick="headerBack()">⬅️ Back</button>
     </div>
     <div class="topbar-right">
-      <button class="header-reset-btn" id="headerResetBtn" onclick="headerResetSync()" title="Reset &amp; Sync data with Google Sheet"><span>🔄</span></button>
+      <button class="header-reset-btn" id="headerResetBtn" onclick="headerResetSync()" title="Reset &amp; Sync data with Google Sheet"><span>🔄</span><i class="sync-dot" id="syncDot"></i></button>
       <button class="review-pill" id="reviewPendingBtn" onclick="openReviewList()">
         📋 Review <span class="count" id="reviewCount">0</span>
       </button>
@@ -1184,6 +1189,90 @@ function lsGet(key, fallback){
   try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; }
 }
 function lsSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+
+/* ================= STORAGE ARCHITECTURE (0 ms SWR) =================
+   Layer 1  MEMORY      -> everything the screen reads (synchronous, 0 ms)
+   Layer 2  localStorage-> tiny "boot snapshot": session, dashboard rows, light dropdown data
+                           (read synchronously at page start = first paint with data, no spinner)
+   Layer 3  IndexedDB   -> heavy data: Link/Span/Site lists, drafts with photos, TT copy
+                           (no 5 MB limit; loaded into memory right after first paint)
+   Network  Apps Script -> Stale-While-Revalidate: show cache first, then ask server
+                           with our version; "notModified" = nothing to download. */
+const IDB = (()=>{
+  const DB_NAME = 'rjcmwo', STORE = 'kv';
+  let dbp = null;
+  const ok = (()=>{ try{ return !!window.indexedDB; }catch(e){ return false; } })();
+  function db(){
+    if(!ok) return Promise.reject(new Error('no idb'));
+    if(!dbp) dbp = new Promise((res, rej)=>{
+      const r = indexedDB.open(DB_NAME, 1);
+      r.onupgradeneeded = ()=> r.result.createObjectStore(STORE);
+      r.onsuccess = ()=> res(r.result);
+      r.onerror = ()=> rej(r.error);
+      r.onblocked = ()=> rej(new Error('idb blocked'));
+    });
+    return dbp;
+  }
+  function tx(mode, fn){
+    return db().then(d=> new Promise((res, rej)=>{
+      const t = d.transaction(STORE, mode), st = t.objectStore(STORE);
+      const out = fn(st);
+      t.oncomplete = ()=> res(out && 'result' in out ? out.result : undefined);
+      t.onerror = ()=> rej(t.error); t.onabort = ()=> rej(t.error);
+    }));
+  }
+  return {
+    available: ok,
+    get: k => tx('readonly', st=> st.get(k)).catch(()=> lsGet('idbfb_' + k, undefined)),
+    set: (k, v) => tx('readwrite', st=> st.put(v, k)).catch(()=> lsSet('idbfb_' + k, v)),
+    del: k => tx('readwrite', st=> st.delete(k)).catch(()=>{ try{ localStorage.removeItem('idbfb_' + k); }catch(e){} }),
+    entries: prefix => db().then(d=> new Promise((res, rej)=>{
+      const out = {}, t = d.transaction(STORE, 'readonly');
+      const range = IDBKeyRange.bound(prefix, prefix + '\uffff');
+      const cur = t.objectStore(STORE).openCursor(range);
+      cur.onsuccess = ()=>{ const c = cur.result; if(c){ out[c.key] = c.value; c.continue(); } else res(out); };
+      cur.onerror = ()=> rej(cur.error);
+    })).catch(()=> ({}))
+  };
+})();
+
+/* Start reading IndexedDB IMMEDIATELY at script start (runs in parallel while the
+   screen is painted from memory / localStorage snapshot) -> no visible wait anywhere. */
+const IDB_PRE = {
+  ref: IDB.get('ref_heavy'),
+  tt: IDB.get('tt_cache'),
+  drafts: IDB.entries('rjcmwo_draft_')
+};
+
+/* ---- Drafts (FRT field form + photos): memory + IndexedDB (debounced writes) ---- */
+const DRAFTS = {};
+let DRAFTS_READY = false, draftsReadyP = null;
+const draftTimers = {};
+function draftGet(key){ return key ? (DRAFTS[key] || null) : null; }
+function draftPut(key, d){
+  if(!key) return;
+  DRAFTS[key] = d;
+  clearTimeout(draftTimers[key]);
+  draftTimers[key] = setTimeout(()=> IDB.set(key, JSON.parse(JSON.stringify(d))), 250);
+}
+function draftDel(key){
+  if(!key) return;
+  delete DRAFTS[key]; clearTimeout(draftTimers[key]);
+  IDB.del(key);
+}
+async function hydrateDrafts_(){
+  // move old localStorage drafts (5 MB limit) into IndexedDB once
+  try{
+    Object.keys(localStorage).filter(k=> k.indexOf('rjcmwo_draft_') === 0).forEach(k=>{
+      const v = lsGet(k, null);
+      if(v){ DRAFTS[k] = DRAFTS[k] || v; IDB.set(k, v); }
+      localStorage.removeItem(k);
+    });
+  }catch(e){}
+  const all = (await IDB_PRE.drafts) || {};
+  Object.keys(all).forEach(k=>{ if(!DRAFTS[k]) DRAFTS[k] = all[k]; });
+  DRAFTS_READY = true;
+}
 function pad2_(n){ return String(n).padStart(2,'0'); }
 function localDateInputValue(d){ return d.getFullYear()+'-'+pad2_(d.getMonth()+1)+'-'+pad2_(d.getDate()); }
 function localTimeInputValue(d){ return pad2_(d.getHours())+':'+pad2_(d.getMinutes())+':'+pad2_(d.getSeconds()); }
@@ -1209,7 +1298,13 @@ const LS_MIGRATED = 'rjcmwo_migratedV1';
 const ttCache = lsGet(LS_TT, null);
 let openFaults = (ttCache && ttCache.faults) || [];
 let reviewQueue = (ttCache && ttCache.reviews) || [];
-function saveTTCache(){ lsSet(LS_TT, { faults: openFaults, reviews: reviewQueue, savedAt: Date.now() }); }
+let TT_VER = (ttCache && ttCache.ver) || '';
+let ttLastFull = 0;                                   // last full (forced) sheet read
+function saveTTCache(){
+  const snap = { faults: openFaults, reviews: reviewQueue, ver: TT_VER, savedAt: Date.now() };
+  lsSet(LS_TT, snap);                                  // boot snapshot (0 ms first paint)
+  IDB.set('tt_cache', snap);                           // durable copy
+}
 let currentDetailTT = null;   // TT object currently viewed
 let currentDraftKey = null;   // localStorage key for in-progress FRT field form
 let newTTClockTimer = null, detailClockTimer = null, locClockTimer = null;
@@ -1551,8 +1646,16 @@ function ttSignature_(){
 function loadTTData(force){
   if(ttLoading) return ttLoading;
   const readStartedAt = Date.now();
-  ttLoading = callServer('getTTData').then(res=>{
+  if(force) ttLastFull = Date.now();
+  ttLoading = callServer('getTTData', { ver: force ? '' : TT_VER, force: !!force }).then(res=>{
     if(!res || !res.ok) throw new Error((res && res.error) || 'TT data load failed.');
+    if(res.notModified){                               // SWR: our cached copy is current
+      TT_VER = res.ver || TT_VER;
+      saveTTCache();                                   // IndexedDB copy stamped "synced now"
+      refreshAfterTTLoad_(false);
+      return true;
+    }
+    TT_VER = res.ver || '';
     openFaults = res.rows.filter(r=> r['Status'] === 'Open').map(rowToFault_);
     reviewQueue = res.rows.filter(r=> r['Status'] === 'Review Pending').map(rowToReview_);
     applyLocalOps_(readStartedAt);                    // keep my unsaved / just-saved changes on screen
@@ -1592,10 +1695,34 @@ function refreshAfterTTLoad_(changed){
   else if(currentPage === 'review') renderReviewList();
 }
 /* 30-sec background sync: send pending changes, then read fresh data */
+/* Every 30 sec: Google Sheet -> memory -> IndexedDB (+ localStorage snapshot). Silent, no reload.
+   Dropdown lists and TT data both use versions -> unchanged data is not downloaded again. */
+let syncBusy30 = false, lastSyncAt = 0;
 async function backgroundSync_(){
-  if(!session || document.visibilityState !== 'visible') return;
-  await flushOutbox();
-  if(currentPage !== 'loc') loadTTData();
+  if(syncBusy30) return;                               // runs every 30 sec (also on Fault Location page / background tab)
+  syncBusy30 = true;
+  setSyncState_('busy');
+  let ok = true;
+  try{
+    ok = (await loadReferenceData()) !== false;
+    if(session){
+      await flushOutbox();
+      const tOk = await loadTTData(Date.now() - ttLastFull > 5 * 60 * 1000);   // full check every 5 min
+      ok = ok && tOk !== false;
+    }
+  }catch(e){ ok = false; }
+  finally{
+    syncBusy30 = false;
+    if(ok) lastSyncAt = Date.now();
+    setSyncState_(ok ? 'ok' : 'err');
+  }
+}
+function setSyncState_(state){
+  const dot = document.getElementById('syncDot'), btn = document.getElementById('headerResetBtn');
+  if(!dot) return;
+  dot.className = 'sync-dot ' + state;
+  const t = lastSyncAt ? new Date(lastSyncAt).toLocaleTimeString() : '—';
+  btn.title = 'Reset & Sync  |  Auto-sync every 30 sec  |  Last sync: ' + t + (state === 'err' ? '  (last try failed)' : '');
 }
 
 /* Upload every captured photo (data:...) to Drive — 4 photos in PARALLEL (fast).
@@ -1873,12 +2000,27 @@ function initRefDropdowns(){
 }
 /* Background refresh — no loader, no blocking. Cached data is already on screen. */
 let lastRefError = '';
-function loadReferenceData(){
-  return callServer('getReferenceData').then(res=>{
+let REF_VER = '';
+const REF_HEAVY_KEYS = ['links', 'siteRows', 'sites'];
+function saveRefCache_(){
+  const lite = {}, heavy = {};
+  Object.keys(REF).forEach(k=> (REF_HEAVY_KEYS.includes(k) ? heavy : lite)[k] = REF[k]);
+  lsSet(LS_REF, { data: lite, ver: REF_VER, savedAt: Date.now() });   // small -> instant login dropdowns
+  IDB.set('ref_heavy', { data: heavy, ver: REF_VER });                // big Link/Span/Site lists
+}
+async function hydrateRefHeavy_(){
+  const h = await IDB_PRE.ref;
+  if(h && h.data && (!(REF.links||[]).length)){ Object.assign(REF, h.data); initRefDropdowns(); }
+}
+/* SWR: send our version; server replies notModified (tiny) or new data */
+function loadReferenceData(force){
+  return callServer('getReferenceData', { ver: force ? '' : REF_VER, force: !!force }).then(res=>{
     if(!res || !res.ok) throw new Error((res && res.error) || 'Reference data load failed.');
-    REF = res.data;
     refLoadedOnce = true;
-    lsSet(LS_REF, { data: REF, savedAt: Date.now() });
+    if(res.notModified){ return true; }                // cache already current -> nothing to redraw
+    REF = res.data;
+    REF_VER = res.ver || '';
+    saveRefCache_();
     initRefDropdowns();
     return true;
   }).catch(err=>{
@@ -2099,7 +2241,7 @@ async function headerResetSync(){
   const btn = document.getElementById('headerResetBtn');
   btn.classList.add('spinning');
   try{
-    const refOk = await loadReferenceData();
+    const refOk = await loadReferenceData(true);
     if(!refOk) throw new Error(lastRefError || 'Sheet se data nahi aaya.');
     await flushOutbox();
     const ttOk = await loadTTData(true);
@@ -2150,7 +2292,7 @@ function headerReset(){
   } else if(currentPage === 'detail'){
   } else if(currentPage === 'loc'){
     if(locMode === 'fiber' || locMode === 'patch'){
-      if(currentDraftKey) localStorage.removeItem(currentDraftKey);
+      draftDel(currentDraftKey);
       draft = emptyDraft();
       ['ownershipSel','faultType3Sel','pcSiteId','pcSiteType','pcFaultTypeSel','pcRoxtec','pcDoorAlign','pcRooting','pcCondition','pcBottomPCC','pcFdmsSealing']
         .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -2445,6 +2587,7 @@ let draft = emptyDraft();
 let locMode = 'fiber'; // 'fiber' | 'patch' | 'sfp' | 'others'
 
 function openGoToLocation(){
+  if(!DRAFTS_READY && draftsReadyP){ draftsReadyP.then(()=> openGoToLocation()); return; }   // wait few ms for IndexedDB drafts
   const ft = currentDetailTT.faultType1;
   locMode = ft === 'Fiber Cut' ? 'fiber' : ft === 'Patch Chord' ? 'patch' : ft === 'SFP Issue' ? 'sfp' : 'others';
 
@@ -2456,7 +2599,7 @@ function openGoToLocation(){
 
   if(locMode==='fiber' || locMode==='patch'){
     currentDraftKey = draftKeyFor(currentDetailTT.ttNo);
-    draft = lsGet(currentDraftKey, emptyDraft());
+    draft = draftGet(currentDraftKey) || emptyDraft();
 
     document.getElementById('locTTNo').textContent = currentDetailTT.ttNo;
     document.getElementById('locPPRJ').textContent = session.pprj ? ('PPRJ' + session.pprj) : 'PPRJ--------';
@@ -2557,7 +2700,7 @@ function saveDraft(){
   draft.pcCondition = document.getElementById('pcCondition').value;
   draft.pcBottomPCC = document.getElementById('pcBottomPCC').value;
   draft.pcFdmsSealing = document.getElementById('pcFdmsSealing').value;
-  if(currentDraftKey) lsSet(currentDraftKey, draft);
+  draftPut(currentDraftKey, draft);
   refreshChecklist();
 }
 function onSiteTypeChange(){
@@ -2644,7 +2787,7 @@ async function addCapturedPhoto_(srcDataUrl, target){
   if(key==='prePhotos' && !draft.firstPreTs) draft.firstPreTs = now.getTime();
   if(key==='postPhotos' && !draft.firstPostTs) draft.firstPostTs = now.getTime();
   renderPhotoStrip(PHOTO_STRIPS[target], draft[key]);
-  if(currentDraftKey) lsSet(currentDraftKey, draft);
+  draftPut(currentDraftKey, draft);
   updateTravelAndRestoreTime();
   refreshChecklist();
   toast('Photo captured.','ok');
@@ -2921,7 +3064,7 @@ async function saveRecordedVideo_(target, blob, secs){
   const now = new Date();
   draft[target] = { kind:'video', full:'', ts: now.getTime(), tsLabel: now.toLocaleString(), secs, ext, status:'uploading' };
   const local = VIDEO_LOCAL[vk] = { blobUrl: URL.createObjectURL(blob), dataUrl: null, promise: null };
-  if(currentDraftKey) lsSet(currentDraftKey, draft);
+  draftPut(currentDraftKey, draft);
   renderVideoStrips_();
   toast('Video recorded (' + secs + 's) — Drive par upload ho raha hai...','ok');
   local.dataUrl = await blobToDataUrl_(blob);
@@ -2937,16 +3080,16 @@ async function uploadVideo_(ttNo, target, dataUrl, ext){
     try{ res = await callServer('uploadPhoto', { ttNo, folderId: fr.folderId, dataUrl, fileName: ttNo + '_' + target + '_' + vts + '.' + ext }); }
     catch(e){ res = { ok:false, error:e.message }; }
   }
-  const d = (currentDetailTT && currentDetailTT.ttNo === ttNo) ? draft : lsGet(draftKeyFor(ttNo), null);
+  const d = (currentDetailTT && currentDetailTT.ttNo === ttNo) ? draft : draftGet(draftKeyFor(ttNo));
   if(res && res.ok){
     if(d && d[target]){ d[target].full = res.url; d[target].status = 'uploaded'; }
-    if(d === draft){ if(currentDraftKey) lsSet(currentDraftKey, draft); renderVideoStrips_(); }
-    else if(d){ lsSet(draftKeyFor(ttNo), d); }
+    if(d === draft){ draftPut(currentDraftKey, draft); renderVideoStrips_(); }
+    else if(d){ draftPut(draftKeyFor(ttNo), d); }
     toast((target === 'preVideo' ? 'Pre' : 'Post') + ' Video Drive par upload ho gaya ✔','ok');
     return res.url;
   }
   if(d && d[target]) d[target].status = 'failed';
-  if(d === draft){ if(currentDraftKey) lsSet(currentDraftKey, draft); renderVideoStrips_(); }
+  if(d === draft){ draftPut(currentDraftKey, draft); renderVideoStrips_(); }
   throw new Error((res && res.error) || 'Video upload failed');
 }
 /* Used at Submit: returns the Drive link (waits / retries if needed) */
@@ -2984,7 +3127,7 @@ function renderVideoStrips_(){
 function removeVideo(k){
   draft[k] = null;
   if(currentDetailTT) delete VIDEO_LOCAL[videoKey_(currentDetailTT.ttNo, k)];
-  if(currentDraftKey) lsSet(currentDraftKey, draft);
+  draftPut(currentDraftKey, draft);
   renderVideoStrips_();
 }
 
@@ -3059,7 +3202,7 @@ function uploadCbudSnap(evt){
     c.width = Math.round(img.width*sc); c.height = Math.round(img.height*sc);
     c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
     draft.cbudSnap = { dataUrl: c.toDataURL('image/jpeg', 0.8), ts: Date.now(), tsLabel: new Date().toLocaleString() };
-    if(currentDraftKey) lsSet(currentDraftKey, draft);
+    draftPut(currentDraftKey, draft);
     renderPhotoStrip('cbudSnapStrip', [draft.cbudSnap]);
     refreshChecklist();
   };
@@ -3072,7 +3215,7 @@ function uploadJPW(evt){
   const reader = new FileReader();
   reader.onload = e=>{
     draft.jpwPhoto = { dataUrl:e.target.result, ts:Date.now(), tsLabel:new Date().toLocaleString() };
-    if(currentDraftKey) lsSet(currentDraftKey, draft);
+    draftPut(currentDraftKey, draft);
     renderJPWStrips();
     refreshChecklist();
   };
@@ -3099,7 +3242,7 @@ function removePhoto(elId, idx){
   const key = map[elId];
   if(key==='jpwPhoto' || key==='cbudSnap'){ draft[key] = null; }
   else { draft[key].splice(idx,1); }
-  if(currentDraftKey) lsSet(currentDraftKey, draft);
+  draftPut(currentDraftKey, draft);
   if(key==='jpwPhoto'){ renderJPWStrips(); }
   else if(key==='cbudSnap'){ renderPhotoStrip(elId, []); }
   else { renderPhotoStrip(elId, draft[key]); }
@@ -3185,13 +3328,13 @@ async function submitFaultForReview(){
   try{
     const urls = await uploadDraftPhotos_(tt.ttNo, dr, (n,t)=>{ btn.textContent = `⏳ Uploading photos ${n}/${t}...`; });
     if(currentDraftKey === key){ draft = dr; }                      // uploaded links kept -> retry won't re-upload
-    try{ lsSet(key, dr); }catch(e){}
+    draftPut(key, dr);
     btn.textContent = '⏳ Saving...';
     const res = await callServer('updateTT', { ttNo: tt.ttNo, action:'frtSubmit', fields: draftToFields_(dr, tt, urls), by: whoAmI_() });
     if(!res || !res.ok){ toast((res && res.error) || 'Submit failed.','err'); if(res && res.stale) loadTTData(); return; }
     openFaults = openFaults.filter(f=>f.ttNo!==tt.ttNo);
     saveTTCache();
-    localStorage.removeItem(key);
+    draftDel(key);
     toast('Submitted for Engineer review (Verification sheet updated).','ok');
     goHome();
     loadTTData();
@@ -3447,7 +3590,10 @@ document.addEventListener('keydown', function(e){
 (function boot(){
   // 1) Instant: show UI from localStorage cache (no loading screen)
   const cachedRef = lsGet(LS_REF, null);
-  if(cachedRef && cachedRef.data){ REF = Object.assign(REF, cachedRef.data); refLoadedOnce = true; }
+  if(cachedRef && cachedRef.data){
+    REF = Object.assign(REF, cachedRef.data); refLoadedOnce = true; REF_VER = cachedRef.ver || '';
+    if((cachedRef.data.links || []).length) saveRefCache_();   // old full copy -> split (frees localStorage)
+  }
   setLoginMode('FRT');
   initRefDropdowns();
   document.getElementById('loginCMP').addEventListener('change', e=>{ e.target.dataset.touched = '1'; fillSavedPassword(); });
@@ -3463,9 +3609,22 @@ document.addEventListener('keydown', function(e){
   document.getElementById('loginUserId').addEventListener('input', fillSavedPassword);
   if(session && session.role){ enterApp(); }
   else { showScreen('login'); }
-  // 2) Background: fetch fresh dropdown data + TT data from Sheet and update silently
-  loadReferenceData();
-  (async ()=>{ await migrateLocalTTs(); await flushOutbox(); loadTTData(); })();
+  // 2) Right after first paint: load heavy data from IndexedDB into memory (few ms)
+  draftsReadyP = hydrateDrafts_().catch(()=>{ DRAFTS_READY = true; });
+  const hydrated = Promise.all([draftsReadyP, hydrateRefHeavy_(), (async ()=>{
+    const t = await IDB_PRE.tt;                         // IndexedDB copy newer than localStorage snapshot? use it
+    if(t && t.faults && (!ttCache || (t.savedAt || 0) > (ttCache.savedAt || 0))){
+      openFaults = t.faults; reviewQueue = t.reviews || []; TT_VER = t.ver || '';
+      if(session) refreshAfterTTLoad_(true);
+    }
+  })()]).catch(()=>{});
+  // 3) Revalidate in background (SWR): only changed data is downloaded
+  hydrated.then(()=> loadReferenceData());
+  (async ()=>{
+    await hydrated; await migrateLocalTTs(); await flushOutbox();
+    const ok = await loadTTData();                    // full check comes with the 30-sec sync
+    if(ok !== false){ lastSyncAt = Date.now(); setSyncState_('ok'); } else setSyncState_('err');
+  })();
   // 3) Auto sync every 30 sec — silent, no page reload; screen updates only if data changed
   setInterval(backgroundSync_, 30000);
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'visible') backgroundSync_(); });
