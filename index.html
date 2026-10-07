@@ -1343,7 +1343,8 @@ function callServer(fnName, arg){
         const err = new Error(status === 0
           ? 'API se connect nahi ho paya (net / deployment). Check: ' + API_URL + '?api=ping'
           : 'Server ka jawab nahi mila (HTTP ' + status + '). Dobara try karein.');
-        err.retryable = true;
+        err.retryable = status !== 0;                // 0 = blocked by browser (deployment / quota) -> retry later, not now
+        err.blocked = status === 0;
         throw err;
       }
       if(j.__error) throw new Error(j.__error);
@@ -1698,8 +1699,10 @@ function refreshAfterTTLoad_(changed){
 /* Every 30 sec: Google Sheet -> memory -> IndexedDB (+ localStorage snapshot). Silent, no reload.
    Dropdown lists and TT data both use versions -> unchanged data is not downloaded again. */
 let syncBusy30 = false, lastSyncAt = 0;
-async function backgroundSync_(){
+let syncFails = 0, syncNextAt = 0, syncWarned = false;
+async function backgroundSync_(manual){
   if(syncBusy30) return;                               // runs every 30 sec (also on Fault Location page / background tab)
+  if(!manual && Date.now() < syncNextAt) return;       // back-off after failures: 1, 2, 4 ... max 5 min
   syncBusy30 = true;
   setSyncState_('busy');
   let ok = true;
@@ -1713,7 +1716,15 @@ async function backgroundSync_(){
   }catch(e){ ok = false; }
   finally{
     syncBusy30 = false;
-    if(ok) lastSyncAt = Date.now();
+    if(ok){ lastSyncAt = Date.now(); syncFails = 0; syncNextAt = 0; }
+    else{
+      syncFails++;
+      syncNextAt = Date.now() + Math.min(5 * 60 * 1000, 30000 * Math.pow(2, syncFails));
+      if(!syncWarned && !IN_APPS_SCRIPT){
+        syncWarned = true;
+        toast('Server se sync nahi ho pa raha — data cache se dikh raha hai. Apps Script deployment check karein: ' + API_URL + '?api=ping', 'err');
+      }
+    }
     setSyncState_(ok ? 'ok' : 'err');
   }
 }
