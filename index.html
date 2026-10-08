@@ -245,7 +245,7 @@ input,select,textarea{font-family:inherit;}
 .hdr{
   background:linear-gradient(120deg,#2F80FF 0%,#1F5FE0 45%,#1546C4 100%);
   color:#fff;padding:14px 18px 14px;
-  display:grid;grid-template-columns:1fr auto 1fr;grid-template-rows:auto auto;
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-rows:auto auto;
   column-gap:16px;row-gap:12px;align-items:center;
   box-shadow:0 4px 16px rgba(21,70,196,0.28);position:sticky;top:0;z-index:40;
 }
@@ -341,6 +341,45 @@ input,select,textarea{font-family:inherit;}
 .mod-tab.t-review.active{box-shadow:0 6px 16px rgba(219,39,119,.38);}
 .mod-tab.t-review .count{background:#fff;color:#DB2777;border-radius:999px;padding:0 8px;font-size:.8rem;font-family:inherit;line-height:1.5;}
 .aging-empty{text-align:center;padding:50px 20px;}
+/* High Aging list */
+.ha-search-wrap{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:14px;box-shadow:var(--shadow);margin-bottom:14px;}
+.ha-search-wrap:focus-within{border-color:#93B4FF;}
+.ha-search-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#8A87A8;}
+#haSearch{width:100%;border:none;outline:none;background:transparent;padding:14px 40px 14px 42px;font-size:.95rem;font-weight:600;color:var(--ink);border-radius:14px;}
+.ha-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:#F1EFFB;color:#6B6884;width:28px;height:28px;border-radius:50%;font-weight:800;cursor:pointer;}
+.ha-meta{display:flex;justify-content:space-between;align-items:center;color:var(--ink-soft);font-weight:700;font-size:.85rem;margin:0 4px 10px;}
+.ha-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;gap:14px;cursor:pointer;
+  box-shadow:0 2px 8px rgba(76,63,168,.06);transition:box-shadow .15s ease, transform .15s ease, border-color .15s ease;}
+.ha-card:hover{box-shadow:0 8px 20px rgba(31,95,224,.14);border-color:#BFD2FF;transform:translateY(-1px);}
+.ha-left{min-width:0;flex:1 1 auto;}
+.ha-cmp{font-size:.74rem;font-weight:700;color:#6B6884;margin-bottom:4px;}
+.ha-ttrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.ha-tt{font-family:'Courier New',monospace;font-weight:800;font-size:1.02rem;color:var(--ink);letter-spacing:.3px;}
+.ha-badge{background:linear-gradient(135deg,#3B82F6,#1D4ED8);color:#fff;border-radius:999px;padding:3px 10px;font-size:.7rem;font-weight:700;white-space:nowrap;}
+.ha-links{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:6px;font-size:.76rem;color:#4B4770;font-weight:600;word-break:break-all;}
+.ha-links b{color:#8A87A8;font-weight:700;}
+.ha-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto;}
+.ha-chip{font-family:'Courier New',monospace;font-weight:700;font-size:.72rem;border-radius:999px;padding:4px 10px;white-space:nowrap;}
+.ha-chip.down{background:#FFF1E6;color:#C2410C;border:1px solid #FED7AA;}
+.ha-chip.clear{background:#E9FBEF;color:#15803D;border:1px solid #BBF7D0;}
+.ha-hl{color:#1D4ED8;font-weight:800;}
+.ha-sugg-type{display:inline-block;min-width:44px;font-size:.66rem;font-weight:800;color:#fff;background:#94A3B8;border-radius:6px;padding:1px 6px;margin-right:8px;text-align:center;}
+.ha-sugg-type.t-TT{background:#1D4ED8;}.ha-sugg-type.t-Link{background:#0F766E;}.ha-sugg-type.t-Span{background:#7C3AED;}.ha-sugg-type.t-CMP{background:#EA580C;}
+/* High Aging detail */
+.ha-dt-head{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;}
+.ha-dt-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;}
+.ha-dt-fields .info-item .val{word-break:break-word;font-size:.9rem;}
+.ha-dt-fields .info-item.empty .val{color:#B8B5CF;font-weight:600;}
+.ha-dt-fields a{color:#1D4ED8;font-weight:800;}
+.ha-loading{display:flex;align-items:center;gap:10px;color:var(--ink-soft);font-weight:700;padding:10px 2px;}
+.ha-loading i{width:18px;height:18px;border:2.5px solid #C7D2FE;border-top-color:#1D4ED8;border-radius:50%;animation:rjspin .8s linear infinite;}
+@media (max-width:600px){
+  .ha-card{flex-direction:column;gap:8px;padding:12px;}
+  .ha-right{flex-direction:row;flex-wrap:wrap;align-items:flex-start;}
+  .ha-chip{font-size:.66rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
+  .ha-dt-head .ha-right{flex-direction:row;flex-wrap:wrap;align-items:flex-start;}
+  .ha-dt-head > div{min-width:0;max-width:100%;}
+}
 .aging-ico{font-size:2.4rem;}
 .aging-h{font-family:'Oswald',sans-serif;font-size:1.4rem;font-weight:700;margin-top:8px;color:var(--ink);}
 .aging-sub{color:var(--ink-soft);font-weight:600;margin-top:6px;}
@@ -349,12 +388,14 @@ input,select,textarea{font-family:inherit;}
    Line 1 = user (left) + Attach / Upload / Run / Logout (right)
    Line 2 = Summary (left) + title (centre) + Search / Reset (right) ---- */
 @media (max-width:1240px){
-  .hdr{grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:auto auto;row-gap:10px;}
+  .hdr{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-rows:auto auto;row-gap:10px;}   /* equal sides -> title exactly centre */
   .hdr-user{grid-column:1;grid-row:1;min-width:0;}
   .hdr-row1{grid-column:2 / 4;grid-row:1;flex-wrap:nowrap;}
   .hdr-left2{grid-column:1;grid-row:2;}
   .hdr-title{grid-column:2;grid-row:2;min-width:0;}
-  .hdr-row2{grid-column:3;grid-row:2;flex-wrap:nowrap;}
+  .hdr-row2{grid-column:3;grid-row:2;flex-wrap:nowrap;justify-self:end;}
+  .hdr-left2{justify-self:start;}
+  .hdr-user{overflow:hidden;}
   .hdr-tags{flex-wrap:nowrap;}
   .hdr-tagline{display:none;}
 }
@@ -1240,9 +1281,6 @@ table.data-table tr:hover td{background:#FAF9FF;}
         <div class="filters-grid">
           <div class="field"><label>📅 From Date</label><input type="date" id="rvFromDate" onchange="renderReviewList()"></div>
           <div class="field"><label>📅 To Date</label><input type="date" id="rvToDate" onchange="renderReviewList()"></div>
-          <div class="field"><label>🌐 Domain</label>
-            <select id="rvDomain" onchange="renderReviewList()"><option value="">All</option><option>Transport</option><option>Access</option></select>
-          </div>
           <div class="field"><label>🏢 CMP</label><select id="rvCMP" onchange="onFilterCMPChange('rvCMP','rvFRT'); renderReviewList()"><option value="">All</option></select></div>
           <div class="field"><label>👷 FRT Name</label><select id="rvFRT" onchange="renderReviewList()"><option value="">All</option></select></div>
           <div class="field"><label>⚠️ Fault Type</label><select id="rvFaultType" onchange="renderReviewList()"><option value="">All</option></select></div>
@@ -1255,14 +1293,20 @@ table.data-table tr:hover td{background:#FAF9FF;}
       <div id="noReviewMsg" class="hidden section-card" style="text-align:center;color:#9C99B8;font-weight:600;">No entries pending review 🎉</div>
     </div>
 
-    <!-- HIGH AGING MODULE (content next update me) -->
+    <!-- HIGH AGING MODULE : Resolved TT sheet, Column K = "High Ageing" -->
     <div id="agingPage" class="hidden">
-      <div class="section-card aging-empty">
-        <div class="aging-ico">⏳</div>
-        <div class="aging-h">High Aging</div>
-        <div class="aging-sub">Is section ka process next update me add hoga.</div>
+      <div class="ha-search-wrap">
+        <svg class="ha-search-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="haSearch" placeholder="Search TT No / Link / Span / CMP..." autocomplete="off">
+        <button type="button" class="ha-clear hidden" id="haClear" onclick="haClearSearch()" title="Clear">✕</button>
       </div>
+      <div class="ha-meta"><span id="haCount">0 TTs</span><span id="haState"></span></div>
+      <div id="haList"></div>
+      <div id="haEmpty" class="hidden section-card" style="text-align:center;color:#9C99B8;font-weight:600;"></div>
     </div>
+
+    <!-- HIGH AGING : TT DETAIL (Database sheet) -->
+    <div id="agingDetailPage" class="hidden"><div id="haDetailHost"></div></div>
   </div>
 </div>
 
@@ -1530,7 +1574,7 @@ let newTTClockTimer = null, detailClockTimer = null, locClockTimer = null;
    On GitHub Pages the in-page LIVE CAMERA works (Apps Script blocks camera inside its frame). */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyNUyrTtZWtnl9spe1EndfXD61pxNVkWJ4o8rK0vaqfNtlk4y6j0B2Sd-fLPaz0TME/exec';   // e.g. https://script.google.com/macros/s/AKfy..../exec
 const IN_APPS_SCRIPT = !!(window.google && google.script && google.script.run);
-const UI_VERSION = 'UI-2026-10-08-h5';   // console me dikhega -> pata chale naya Index.html chal raha hai
+const UI_VERSION = 'UI-2026-10-08-h7';   // console me dikhega -> pata chale naya Index.html chal raha hai
 console.log('%c[RJ CM WO] ' + UI_VERSION, 'color:#1F5FE0;font-weight:bold');
 function callServer(fnName, arg){
   if(IN_APPS_SCRIPT){
@@ -1558,7 +1602,6 @@ function callServer(fnName, arg){
       let j = null;
       try{ j = JSON.parse(t); }catch(e){}
       if(!j){
-        console.warn('[API] ' + fnName + ' -> HTTP ' + status + ' (no JSON reply)');
         const err = new Error(status === 0
           ? 'API se connect nahi ho paya (net / deployment). Check: ' + API_URL + '?api=ping'
           : 'Server ka jawab nahi mila (HTTP ' + status + '). Dobara try karein.');
@@ -1573,6 +1616,7 @@ function callServer(fnName, arg){
     });
   const run = (n)=> once().catch(err=>{
     if(err.retryable && n > 1) return new Promise(r=> setTimeout(r, 1200)).then(()=> run(n - 1));
+    console.warn('[API] ' + fnName + ' fail: ' + err.message);     // only after all retries
     throw err;
   });
   return run(tries);
@@ -2443,6 +2487,7 @@ function applyRoleFilters(){
 function goHome(){
   currentModule = 'cmwo';
   document.getElementById('agingPage').classList.add('hidden');
+  document.getElementById('agingDetailPage').classList.add('hidden');
   setActiveTab_('cmwo');
   document.getElementById('homePage').classList.remove('hidden');
   document.getElementById('detailPage').classList.add('hidden');
@@ -2464,13 +2509,18 @@ function setPage(p, title){
   document.getElementById('mainHeader').classList.toggle('hidden', drill);
   document.getElementById('modTabs').classList.toggle('hidden', drill);
   document.getElementById('drillHeader').classList.toggle('hidden', !drill);
-  if(drill){
+  if(drill && p === 'agingDetail'){
+    currentModule = 'aging'; setActiveTab_('aging');
+    document.getElementById('drillTitle').textContent = title || 'High Aging — TT Detail';
+  } else if(drill){
     document.getElementById('agingPage').classList.add('hidden');   // drill pages belong to CM WO
+    document.getElementById('agingDetailPage').classList.add('hidden');
     currentModule = 'cmwo'; setActiveTab_('cmwo');
     document.getElementById('drillTitle').textContent = title || drillTitle_(p);
   }
   if(p === 'review'){
     document.getElementById('agingPage').classList.add('hidden');
+    document.getElementById('agingDetailPage').classList.add('hidden');
     currentModule = 'cmwo'; setActiveTab_('review');
   } else if(p === 'home'){
     setActiveTab_(currentModule);
@@ -2496,15 +2546,17 @@ function setActiveTab_(m){
 function switchModule(m){
   if(m === 'cmwo'){ goHome(); return; }
   currentModule = 'aging';
-  ['homePage','detailPage','locPage','reviewListPage'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  ['homePage','detailPage','locPage','reviewListPage','agingDetailPage'].forEach(id => document.getElementById(id).classList.add('hidden'));
   stopAllClocks();
   document.getElementById('agingPage').classList.remove('hidden');
   setActiveTab_('aging');
   setPage('home');
+  loadHighAging(false);
 }
 /* Header user block (left side) */
 function setUserHeader_(){
   if(!session) return;
+  haInitSearch_();
   const name = session.name || session.frt || 'User';
   document.getElementById('hdrAvatar').textContent = name.trim().charAt(0).toUpperCase() || 'U';
   document.getElementById('hdrName').textContent = name;
@@ -2621,6 +2673,7 @@ async function hdrRun(){
     const res = await callServer('runResolvedTTDump', {});
     if(!res || !res.ok) throw new Error((res && res.error) || 'Run fail.');
     toast('Resolved TT Dump Updated', 'ok');
+    HA.loadedAt = 0; if(currentModule === 'aging') loadHighAging(true);
     console.log('[Run] ' + res.file + ' -> ' + res.rows + ' Rajasthan rows');
   }catch(err){
     toast('Run nahi hua: ' + err.message, 'err');
@@ -2628,10 +2681,151 @@ async function hdrRun(){
     dumpBusy = false; btn.classList.remove('running'); btn.title = '';
   }
 }
+/* ================= HIGH AGING =================
+   Data: Resolved TT sheet (Column K = "High Ageing"). Shown instantly from memory / IndexedDB, refreshed from server. */
+const HA = { rows: [], loadedAt: 0, busy: false, q: '', sugg: [], suggIdx: -1, box: null, ready: false };
+IDB.get('high_aging').then(v => { if(v && Array.isArray(v.rows) && !HA.rows.length){ HA.rows = v.rows; if(currentModule === 'aging') renderHighAging(); } });
+async function loadHighAging(force){
+  if(HA.rows.length) renderHighAging();
+  else{ document.getElementById('haList').innerHTML = '<div class="ha-loading"><i></i> Resolved TT sheet se data aa raha hai…</div>'; document.getElementById('haEmpty').classList.add('hidden'); }
+  if(HA.busy || (!force && Date.now() - HA.loadedAt < 30000)) return;
+  HA.busy = true; document.getElementById('haState').textContent = '⟳ syncing…';
+  try{
+    const res = await callServer('getHighAging', {});
+    if(!res || !res.ok) throw new Error((res && res.error) || 'Data nahi aaya.');
+    HA.rows = res.rows || []; HA.loadedAt = Date.now();
+    IDB.set('high_aging', { rows: HA.rows, at: HA.loadedAt });
+    document.getElementById('haState').textContent = '';
+    if(currentModule === 'aging') renderHighAging();
+  }catch(err){
+    document.getElementById('haState').textContent = '⚠ offline (cache)';
+    if(!HA.rows.length){ document.getElementById('haList').innerHTML = ''; showHaEmpty_('Data load nahi hua: ' + escHtml_(err.message)); }
+  }finally{ HA.busy = false; }
+}
+function showHaEmpty_(html){ const e = document.getElementById('haEmpty'); e.innerHTML = html; e.classList.remove('hidden'); }
+function haMatch_(r, q){
+  if(!q) return true;
+  return [r.tt, r.link, r.span, r.cmp].some(v => String(v || '').toLowerCase().indexOf(q) > -1);
+}
+function haHl_(v, q){ v = String(v || '-'); return q ? acHighlight_(v, q).replace(/class="ac-hl"/g, 'class="ha-hl"') : escHtml_(v); }
+function renderHighAging(){
+  const q = HA.q.trim().toLowerCase();
+  const list = HA.rows.map((r, i) => ({ r, i })).filter(x => haMatch_(x.r, q));
+  document.getElementById('haCount').textContent = list.length + (q ? ' / ' + HA.rows.length : '') + ' TTs';
+  const host = document.getElementById('haList');
+  host.innerHTML = list.map(({ r, i }) => `
+    <div class="ha-card" onclick="openAgingDetail(${i})">
+      <div class="ha-left">
+        <div class="ha-cmp">${haHl_(r.cmp, q)}</div>
+        <div class="ha-ttrow"><span class="ha-tt">${haHl_(r.tt, q)}</span>${r.service ? `<span class="ha-badge">${escHtml_(r.service)}</span>` : ''}</div>
+        <div class="ha-links"><span><b>Link:</b> ${haHl_(r.link, q)}</span><span><b>Span:</b> ${haHl_(r.span, q)}</span></div>
+      </div>
+      <div class="ha-right">
+        <span class="ha-chip down">Down Time: ${escHtml_(r.down || '-')}</span>
+        <span class="ha-chip clear">Clear Time: ${escHtml_(r.clear || '-')}</span>
+      </div>
+    </div>`).join('');
+  if(!list.length) showHaEmpty_(HA.rows.length ? 'Koi TT match nahi hua.' : 'Resolved TT sheet me koi "High Ageing" TT nahi hai.');
+  else document.getElementById('haEmpty').classList.add('hidden');
+}
+/* Search box: instant filter + suggestion dropdown (TT / Link / Span / CMP) */
+function haInitSearch_(){
+  if(HA.ready) return; HA.ready = true;
+  const inp = document.getElementById('haSearch');
+  HA.box = document.createElement('div'); HA.box.className = 'ac-list'; document.body.appendChild(HA.box);
+  const pos = ()=>{ if(!HA.box.classList.contains('show')) return; const r = inp.getBoundingClientRect();
+    HA.box.style.left = r.left + 'px'; HA.box.style.width = r.width + 'px'; HA.box.style.top = (r.bottom + 4) + 'px'; HA.box.style.bottom = '';
+    HA.box.style.maxHeight = Math.max(160, Math.min(320, window.innerHeight - r.bottom - 12)) + 'px'; };
+  window.addEventListener('resize', pos); window.addEventListener('scroll', pos, true);
+  const show = ()=>{
+    const q = inp.value.trim().toLowerCase();
+    HA.q = inp.value; document.getElementById('haClear').classList.toggle('hidden', !inp.value);
+    renderHighAging();
+    if(!q){ HA.box.classList.remove('show'); return; }
+    const seen = {}, out = [];
+    const add = (type, v) => { v = String(v || '').trim(); if(!v) return; const k = type + '|' + v; if(seen[k]) return;
+      const i = v.toLowerCase().indexOf(q); if(i < 0) return; seen[k] = 1; out.push({ type, v, starts: i === 0 }); };
+    HA.rows.forEach(r => { add('TT', r.tt); add('Link', r.link); add('Span', r.span); add('CMP', r.cmp); });
+    out.sort((a, b) => (b.starts - a.starts));
+    HA.sugg = out.slice(0, 60); HA.suggIdx = -1;
+    HA.box.innerHTML = HA.sugg.length
+      ? HA.sugg.map((x, i) => `<div class="ac-item" data-i="${i}"><span class="ha-sugg-type t-${x.type}">${x.type}</span>${acHighlight_(x.v, q)}</div>`).join('')
+        + (out.length > 60 ? `<div class="ac-note">${out.length} results — aur type karein.</div>` : '')
+      : `<div class="ac-note">Koi match nahi mila.</div>`;
+    HA.box.querySelectorAll('.ac-item').forEach(el => el.addEventListener('mousedown', e => { e.preventDefault(); pick(+el.dataset.i); }));
+    HA.box.classList.add('show'); HA.box.scrollTop = 0; pos();
+  };
+  const pick = i => { const x = HA.sugg[i]; if(!x) return; inp.value = x.v; HA.q = x.v; HA.box.classList.remove('show'); renderHighAging();
+    document.getElementById('haClear').classList.remove('hidden'); };
+  inp.addEventListener('input', show);
+  inp.addEventListener('focus', ()=>{ if(inp.value.trim()) show(); });
+  inp.addEventListener('blur', ()=> setTimeout(()=> HA.box.classList.remove('show'), 150));
+  inp.addEventListener('keydown', e => {
+    const items = HA.box.querySelectorAll('.ac-item');
+    if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+      if(!items.length) return; e.preventDefault();
+      HA.suggIdx = (HA.suggIdx + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+      items.forEach((el, k) => el.classList.toggle('active', k === HA.suggIdx)); items[HA.suggIdx].scrollIntoView({ block: 'nearest' });
+    } else if(e.key === 'Enter'){ if(HA.suggIdx > -1) pick(HA.suggIdx); else HA.box.classList.remove('show'); }
+    else if(e.key === 'Escape') HA.box.classList.remove('show');
+  });
+}
+function haClearSearch(){ const inp = document.getElementById('haSearch'); inp.value = ''; HA.q = ''; document.getElementById('haClear').classList.add('hidden'); if(HA.box) HA.box.classList.remove('show'); renderHighAging(); inp.focus(); }
+/* Card click -> TT detail: Resolved TT info + all Database sheet columns */
+const HA_DETAIL_CACHE = {};
+async function openAgingDetail(i){
+  const r = HA.rows[i]; if(!r) return;
+  document.getElementById('agingPage').classList.add('hidden');
+  document.getElementById('agingDetailPage').classList.remove('hidden');
+  setPage('agingDetail', 'High Aging — ' + r.tt);
+  const host = document.getElementById('haDetailHost');
+  const top = `
+    <div class="section-card">
+      <div class="ha-dt-head">
+        <div>
+          <div class="ha-cmp">${escHtml_(r.cmp || '-')}</div>
+          <div class="ha-ttrow"><span class="ha-tt" style="font-size:1.25rem;">${escHtml_(r.tt)}</span>${r.service ? `<span class="ha-badge">${escHtml_(r.service)}</span>` : ''}</div>
+          <div class="ha-links"><span><b>Link:</b> ${escHtml_(r.link || '-')}</span><span><b>Span:</b> ${escHtml_(r.span || '-')}</span></div>
+        </div>
+        <div class="ha-right">
+          <span class="ha-chip down">Down Time: ${escHtml_(r.down || '-')}</span>
+          <span class="ha-chip clear">Clear Time: ${escHtml_(r.clear || '-')}</span>
+        </div>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title"><span class="dot"></span> Database Sheet Details</div>
+      <div id="haDbHost"></div>
+    </div>`;
+  host.innerHTML = top;
+  const dbHost = document.getElementById('haDbHost');
+  const paint = d => {
+    if(!d.found){ dbHost.innerHTML = '<div style="color:#9C99B8;font-weight:700;">Ye TT Database sheet me nahi mila.</div>'; return; }
+    dbHost.innerHTML = (d.sheet !== 'Database' ? `<div class="note-banner" style="margin-bottom:12px;">ℹ️ Database me nahi mila — ${escHtml_(d.sheet)} sheet ki details.</div>` : '')
+      + '<div class="ha-dt-fields">' + d.fields.map(([k, v]) => {
+        const val = String(v == null ? '' : v).trim();
+        const html = !val ? '-' : /^https?:\/\//i.test(val)
+          ? val.split(/[\s,]+/).filter(Boolean).map((u, n) => `<a href="${escHtml_(u)}" target="_blank" rel="noopener">Open${val.indexOf(',') > -1 || /\s/.test(val) ? ' ' + (n + 1) : ''}</a>`).join(' · ')
+          : escHtml_(val);
+        return `<div class="info-item${val ? '' : ' empty'}"><div class="lbl">${escHtml_(k)}</div><div class="val">${html}</div></div>`;
+      }).join('') + '</div>';
+  };
+  if(HA_DETAIL_CACHE[r.tt]) paint(HA_DETAIL_CACHE[r.tt]);
+  else dbHost.innerHTML = '<div class="ha-loading"><i></i> Database sheet se details aa rahi hain…</div>';
+  try{
+    const d = await callServer('getDatabaseTT', { ttNo: r.tt });
+    if(!d || !d.ok) throw new Error((d && d.error) || 'Details nahi aayi.');
+    HA_DETAIL_CACHE[r.tt] = d;
+    if(currentPage === 'agingDetail' && document.getElementById('haDbHost') === dbHost) paint(d);
+  }catch(err){
+    if(!HA_DETAIL_CACHE[r.tt]) dbHost.innerHTML = '<div style="color:#B91C1C;font-weight:700;">' + escHtml_(err.message) + '</div>';
+  }
+}
 function hdrSummary(){ hdrComingSoon_('Summary'); }
 function hdrSearch(){ hdrComingSoon_('Search'); }
 function headerBack(){
-  if(currentPage === 'detail') goHome();
+  if(currentPage === 'agingDetail') switchModule('aging');
+  else if(currentPage === 'detail') goHome();
   else if(currentPage === 'loc') backToDetailFromLoc();
   else if(currentPage === 'review') goHome();
   else goHome();
@@ -2733,7 +2927,6 @@ function headerReset(){
     const today = localDateInputValue(new Date());
     document.getElementById('rvFromDate').value = today;
     document.getElementById('rvToDate').value = today;
-    document.getElementById('rvDomain').value = '';
     document.getElementById('rvCMP').value = '';
     onFilterCMPChange('rvCMP','rvFRT');
     document.getElementById('rvFRT').value = '';
@@ -3856,7 +4049,6 @@ function openReviewList(){
 function renderReviewList(){
   const from = document.getElementById('rvFromDate').value;
   const to = document.getElementById('rvToDate').value;
-  const domain = document.getElementById('rvDomain').value;
   const cmp = document.getElementById('rvCMP').value;
   const frt = document.getElementById('rvFRT').value;
   const ft = document.getElementById('rvFaultType').value;
@@ -3865,7 +4057,6 @@ function renderReviewList(){
     const d = localDateInputValue(new Date(r.submittedAt));
     if(from && d < from) return false;
     if(to && d > to) return false;
-    if(domain && r.domain !== domain) return false;
     if(cmp && r.cmp !== cmp) return false;
     if(frt && r.frt !== frt) return false;
     if(ft && r.faultType1 !== ft) return false;
