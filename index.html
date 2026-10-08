@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <title>RJ CM WO Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%A0%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <style>
 :root{
@@ -237,6 +239,172 @@ input,select,textarea{font-family:inherit;}
 }
 .review-pill .count{
   background:#fff;color:#DB2777;border-radius:999px;padding:1px 8px;font-size:.78rem;
+}
+
+/* ================= NEW HEADER ================= */
+.hdr{
+  background:linear-gradient(120deg,#2F80FF 0%,#1F5FE0 45%,#1546C4 100%);
+  color:#fff;padding:14px 18px 14px;
+  display:grid;grid-template-columns:1fr auto 1fr;grid-template-rows:auto auto;
+  column-gap:16px;row-gap:12px;align-items:center;
+  box-shadow:0 4px 16px rgba(21,70,196,0.28);position:sticky;top:0;z-index:40;
+}
+.hdr-user{grid-column:1;grid-row:1;display:flex;align-items:center;gap:12px;min-width:0;}
+.hdr-avatar{width:36px;height:36px;border-radius:50%;background:#fff;color:#1F5FE0;font-weight:800;
+  display:flex;align-items:center;justify-content:center;font-size:.95rem;flex:0 0 auto;box-shadow:0 2px 6px rgba(0,0,0,.15);}
+.hdr-user-txt{min-width:0;}
+.hdr-name{font-weight:700;font-size:.95rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hdr-tags{display:flex;gap:6px;margin-top:3px;flex-wrap:wrap;}
+.hdr-tag{background:rgba(255,255,255,.22);border-radius:999px;padding:2px 9px;font-size:.68rem;font-weight:700;}
+.hdr-tag.dark{background:rgba(10,30,90,.35);}
+.hdr-title{grid-column:2;grid-row:1 / span 2;text-align:center;}
+.hdr-title-main{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.55rem;letter-spacing:.3px;
+  display:inline-flex;align-items:center;gap:8px;line-height:1.1;}
+.hdr-tagline{font-family:'Courier New',monospace;font-weight:700;font-size:.66rem;letter-spacing:.6px;opacity:.92;margin-top:4px;}
+.hdr-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:nowrap;}
+.hdr-actions > *{flex:0 0 auto;}
+.hdr-row1{grid-column:3;grid-row:1;}
+.hdr-row2{grid-column:3;grid-row:2;}
+.hdr-left2{grid-column:1;grid-row:2;}
+.hb-icon{width:40px;height:40px;border-radius:50%;border:none;display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;cursor:pointer;transition:transform .15s ease, filter .15s ease;padding:0;}
+.hb-icon:active,.hb-pill:active,.hb-attach:active{transform:scale(.94);}
+.hb-purple{background:linear-gradient(135deg,#A855F7,#7C3AED);box-shadow:0 3px 10px rgba(124,58,237,.4);}
+.hb-upload{background:rgba(255,255,255,.12);border:2.5px solid #fff;}
+.hb-glass{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;}
+.hb-attach{background:transparent;color:#fff;border:1.5px dashed rgba(255,255,255,.7);border-radius:999px;
+  padding:9px 16px;font-weight:600;font-size:.85rem;display:inline-flex;align-items:center;gap:7px;cursor:pointer;}
+.hb-attach{width:136px;justify-content:center;}
+.hb-attach.has-file{padding-left:11px;padding-right:11px;justify-content:flex-start;}
+.hb-attach-txt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hb-attach svg{flex:0 0 auto;}
+.hb-attach.has-file{background:rgba(255,255,255,.95);color:#1546C4;border-style:solid;border-color:#fff;}
+.hb-icon.busy svg,.hb-pill.busy{opacity:.75;}
+.hb-icon.busy{animation:rjpulse 1s ease-in-out infinite;}
+.dump-only.role-hidden{display:none !important;}
+/* Upload progress ring */
+.hb-upload{position:relative;overflow:visible;}
+.hb-upload .up-ring,.hb-upload .up-pct,.hb-upload .up-tick{display:none;}
+.hb-upload .up-ring{position:absolute;inset:-3px;width:calc(100% + 6px);height:calc(100% + 6px);transform:rotate(-90deg);}
+.up-ring-bg{fill:none;stroke:rgba(255,255,255,.28);stroke-width:3.5;}
+.up-ring-fg{fill:none;stroke:#fff;stroke-width:3.5;stroke-linecap:round;stroke-dasharray:106.8;stroke-dashoffset:106.8;transition:stroke-dashoffset .25s ease;}
+.hb-upload .up-pct{font-size:.62rem;font-weight:800;letter-spacing:-.2px;line-height:1;}
+.hb-upload.uploading{border-color:transparent;animation:none;}
+.hb-upload.uploading .up-arrow{display:none;}
+.hb-upload.uploading .up-ring,.hb-upload.uploading .up-pct{display:block;}
+.hb-upload.done{background:linear-gradient(135deg,#22C55E,#16A34A);border-color:#fff;box-shadow:0 3px 10px rgba(22,163,74,.45);}
+.hb-upload.done .up-arrow{display:none;}
+.hb-upload.done .up-tick{display:block;animation:tickpop .35s ease;}
+@keyframes tickpop{0%{transform:scale(.3);opacity:0;}70%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
+@keyframes rjpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.6);}50%{box-shadow:0 0 0 6px rgba(255,255,255,0);}}
+.hb-pill{border:none;border-radius:999px;padding:10px 20px;font-weight:700;font-size:.9rem;color:#fff;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:transform .15s ease;}
+.hb-green{background:linear-gradient(135deg,#22C55E,#16A34A);box-shadow:0 3px 10px rgba(22,163,74,.4);}
+.hb-red{background:linear-gradient(135deg,#F43F5E,#DC2626);box-shadow:0 3px 10px rgba(220,38,38,.4);}
+.hb-pill.hb-glass{box-shadow:none;}
+/* Run: fixed size, spinner inside while running (button never grows -> header never shifts) */
+#hdrRunBtn{width:78px;justify-content:center;position:relative;}
+#hdrRunBtn .run-spin{display:none;position:absolute;left:50%;top:50%;margin:-8px 0 0 -8px;width:16px;height:16px;box-sizing:border-box;border:2.5px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:rjspin .8s linear infinite;}
+#hdrRunBtn.running .run-txt{visibility:hidden;}
+#hdrRunBtn.running .run-spin{display:inline-block;}
+#hdrRunBtn.running{cursor:progress;}
+.hb-reset{position:relative;}
+.hb-reset .sync-dot{top:-3px;right:-3px;}
+.hb-reset.spinning span{display:inline-block;animation:rjspin .8s linear infinite;}
+.hdr .review-pill{padding:10px 16px;}
+
+/* Drill-down header */
+.hdr-drill{background:linear-gradient(120deg,#2F80FF 0%,#1F5FE0 50%,#1546C4 100%);color:#fff;
+  padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:40;
+  box-shadow:0 4px 16px rgba(21,70,196,0.28);}
+.dh-home{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);
+  color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:0 0 auto;}
+.dh-back{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:999px;
+  padding:9px 18px;font-weight:700;font-size:.9rem;display:inline-flex;align-items:center;gap:7px;cursor:pointer;flex:0 0 auto;}
+.dh-home:active,.dh-back:active{transform:scale(.94);}
+.dh-title{font-family:'Oswald',sans-serif;font-weight:600;font-size:1.2rem;letter-spacing:.2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+
+/* Module tabs */
+.mod-tabs{max-width:1180px;margin:0 auto;padding:16px 22px 0;display:flex;gap:10px;flex-wrap:wrap;}
+.mod-tab{font-family:'Oswald',sans-serif;font-weight:600;font-size:1rem;color:#fff;border:none;border-radius:999px;
+  padding:10px 22px;cursor:pointer;opacity:.62;transition:opacity .15s ease, transform .15s ease, box-shadow .15s ease;}
+.mod-tab:hover{opacity:.85;}
+.mod-tab.active{opacity:1;transform:translateY(-1px);}
+.mod-tab.t-blue{background:linear-gradient(135deg,#3B82F6,#1D4ED8);}
+.mod-tab.t-blue.active{box-shadow:0 6px 16px rgba(29,78,216,.38);}
+.mod-tab.t-orange{background:linear-gradient(135deg,#FDBA74,#F97316);}
+.mod-tab.t-orange.active{box-shadow:0 6px 16px rgba(249,115,22,.38);}
+.mod-tabs.hidden{display:none;}
+.mod-tab.t-review{background:linear-gradient(135deg,#F59E0B,#DB2777);display:inline-flex;align-items:center;gap:7px;
+  }
+.mod-tab.t-review.active{box-shadow:0 6px 16px rgba(219,39,119,.38);}
+.mod-tab.t-review .count{background:#fff;color:#DB2777;border-radius:999px;padding:0 8px;font-size:.8rem;font-family:inherit;line-height:1.5;}
+.aging-empty{text-align:center;padding:50px 20px;}
+.aging-ico{font-size:2.4rem;}
+.aging-h{font-family:'Oswald',sans-serif;font-size:1.4rem;font-weight:700;margin-top:8px;color:var(--ink);}
+.aging-sub{color:var(--ink-soft);font-weight:600;margin-top:6px;}
+
+/* ---- Smaller screens: still TWO lines.
+   Line 1 = user (left) + Attach / Upload / Run / Logout (right)
+   Line 2 = Summary (left) + title (centre) + Search / Reset (right) ---- */
+@media (max-width:1240px){
+  .hdr{grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:auto auto;row-gap:10px;}
+  .hdr-user{grid-column:1;grid-row:1;min-width:0;}
+  .hdr-row1{grid-column:2 / 4;grid-row:1;flex-wrap:nowrap;}
+  .hdr-left2{grid-column:1;grid-row:2;}
+  .hdr-title{grid-column:2;grid-row:2;min-width:0;}
+  .hdr-row2{grid-column:3;grid-row:2;flex-wrap:nowrap;}
+  .hdr-tags{flex-wrap:nowrap;}
+  .hdr-tagline{display:none;}
+}
+/* ---- Mobile: same 2-line structure, compact sizes ---- */
+@media (max-width:760px){
+  .hdr{padding:10px 10px 11px;column-gap:6px;row-gap:9px;}
+  .hdr-user{gap:7px;}
+  .hdr-row1,.hdr-row2{gap:5px;}
+  .hdr-avatar{width:28px;height:28px;font-size:.78rem;}
+  .hdr-name{font-size:.8rem;max-width:110px;}
+  .hdr-tags{gap:4px;margin-top:2px;}
+  .hdr-tag{font-size:.56rem;padding:1px 6px;white-space:nowrap;}
+  #hdrRole{max-width:70px;overflow:hidden;text-overflow:ellipsis;}
+  #hdrScope{flex:0 0 auto;}
+  .hdr-title-main{font-size:.96rem;gap:4px;white-space:nowrap;max-width:100%;overflow:hidden;}
+  .hdr-title{padding:0 2px;}
+  .hdr-title-main svg{width:15px;height:15px;flex:0 0 auto;}
+
+  .hb-icon{width:30px;height:30px;flex:0 0 auto;}
+  .hb-icon svg{width:15px;height:15px;}
+  .hb-upload{border-width:2px;}
+  .hb-attach{padding:5px 9px;font-size:.7rem;gap:4px;white-space:nowrap;flex:0 0 auto;width:96px;}
+  .hb-attach svg{width:12px;height:12px;}
+  .hb-pill{padding:6px 11px;font-size:.74rem;flex:0 0 auto;}
+  #hdrRunBtn{width:50px;padding-left:0;padding-right:0;}
+  #hdrRunBtn .run-spin{width:12px;height:12px;margin:-6px 0 0 -6px;border-width:2px;}
+  .hb-reset .sync-dot{width:9px;height:9px;top:-2px;right:-2px;}
+  .hb-upload .up-pct{font-size:.5rem;}
+  .hb-upload .up-tick{width:16px;height:16px;}
+
+  .hdr-drill{padding:10px 10px;gap:8px;}
+  .dh-home{width:34px;height:34px;}
+  .dh-back{padding:7px 13px;font-size:.8rem;}
+  .dh-title{font-size:.98rem;}
+  .mod-tabs{padding:12px 12px 0;gap:8px;}
+  .mod-tab{padding:8px 15px;font-size:.9rem;}
+  .mod-tab.t-review .count{font-size:.72rem;padding:0 7px;}
+}
+/* very narrow phones (<=380px) */
+@media (max-width:380px){
+  .hdr{padding:9px 7px 10px;column-gap:4px;}
+  .hdr-row1,.hdr-row2{gap:4px;}
+  .hdr-avatar{width:26px;height:26px;}
+  .hdr-name{max-width:84px;}
+  .hb-icon{width:27px;height:27px;}
+  .hb-attach{padding:4px 7px;font-size:.64rem;width:86px;}
+  .hb-pill{padding:5px 9px;font-size:.68rem;}
+  #hdrRunBtn{width:44px;}
+  .hdr-title-main{font-size:.84rem;}
+  .mod-tab{padding:7px 12px;font-size:.84rem;}
 }
 
 .page-wrap{max-width:1180px;margin:0 auto;padding:22px;}
@@ -617,20 +785,57 @@ table.data-table tr:hover td{background:#FAF9FF;}
 
 <!-- ============ APP SHELL ============ -->
 <div id="appShell">
-  <div class="topbar">
-    <div class="topbar-left">
-      <span class="cloud">☁️</span> RJ CM WO Portal
-      <button class="header-back-btn hidden" id="headerBackBtn" onclick="headerBack()">⬅️ Back</button>
+  <!-- MAIN HEADER (home level) -->
+  <header class="hdr" id="mainHeader">
+    <div class="hdr-user">
+      <div class="hdr-avatar" id="hdrAvatar">A</div>
+      <div class="hdr-user-txt">
+        <div class="hdr-name" id="hdrName">Name</div>
+        <div class="hdr-tags"><span class="hdr-tag" id="hdrRole">Role</span><span class="hdr-tag dark" id="hdrScope">All</span></div>
+      </div>
     </div>
-    <div class="topbar-right">
-      <button class="header-reset-btn" id="headerResetBtn" onclick="headerResetSync()" title="Reset &amp; Sync data with Google Sheet"><span>🔄</span><i class="sync-dot" id="syncDot"></i></button>
-      <button class="review-pill" id="reviewPendingBtn" onclick="openReviewList()">
-        📋 Review <span class="count" id="reviewCount">0</span>
+
+    <div class="hdr-title">
+      <div class="hdr-title-main"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z"/></svg> RJ CM WO Portal</div>
+      <div class="hdr-tagline">FAULT RESTORATION &amp; VERIFICATION · FAST RESTORE · ZERO DOWNTIME</div>
+    </div>
+
+    <div class="hdr-actions hdr-row1">
+      <button class="hb-attach dump-only" id="hdrAttachBtn" onclick="hdrAttach()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg><span class="hb-attach-txt" id="hdrAttachTxt">Attach File</span></button>
+      <input type="file" id="dumpFileInput" accept=".csv,.xlsx,.xls,.xlsm,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" style="display:none" onchange="onDumpFilePicked(event)">
+      <button class="hb-icon hb-upload dump-only" id="hdrUploadBtn" onclick="hdrUpload()" title="Upload to Drive">
+        <svg class="up-arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+        <svg class="up-ring" viewBox="0 0 40 40"><circle class="up-ring-bg" cx="20" cy="20" r="17"/><circle class="up-ring-fg" id="upRingFg" cx="20" cy="20" r="17"/></svg>
+        <span class="up-pct" id="upPct">0%</span>
+        <svg class="up-tick" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
       </button>
-      <div class="user-chip" id="userChip">Name<small>Role</small></div>
-      <button class="logout-btn" onclick="doLogout()">Logout</button>
+      <button class="hb-pill hb-green dump-only" id="hdrRunBtn" onclick="hdrRun()"><span class="run-txt">Run</span><i class="run-spin"></i></button>
+      <button class="hb-pill hb-red" onclick="doLogout()">Logout</button>
     </div>
-  </div>
+
+    <div class="hdr-left2">
+      <button class="hb-pill hb-glass" id="hdrSummaryBtn" onclick="hdrSummary()">Summary</button>
+    </div>
+
+    <div class="hdr-actions hdr-row2">
+      <button class="hb-icon hb-glass" id="hdrSearchBtn" onclick="hdrSearch()" title="Search"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+      <button class="hb-pill hb-glass hb-reset" id="headerResetBtn" onclick="headerResetSync()" title="Reset &amp; Sync data with Google Sheet"><span>Reset</span><i class="sync-dot" id="syncDot"></i></button>
+    </div>
+  </header>
+
+  <!-- DRILL-DOWN HEADER (Home + Back + heading) -->
+  <header class="hdr-drill hidden" id="drillHeader">
+    <button class="dh-home" onclick="goHomeFromDrill()" title="Home"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></svg></button>
+    <button class="dh-back" onclick="headerBack()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg> Back</button>
+    <div class="dh-title" id="drillTitle">Detail</div>
+  </header>
+
+  <!-- MODULE TABS -->
+  <nav class="mod-tabs" id="modTabs">
+    <button class="mod-tab t-blue active" id="tabCMWO" onclick="switchModule('cmwo')">CM WO</button>
+    <button class="mod-tab t-orange" id="tabAging" onclick="switchModule('aging')">High Aging</button>
+    <button class="mod-tab t-review" id="reviewPendingBtn" onclick="openReviewList()">📋 Review <span class="count" id="reviewCount">0</span></button>
+  </nav>
 
   <div class="page-wrap">
     <!-- HOME PAGE -->
@@ -1049,6 +1254,15 @@ table.data-table tr:hover td{background:#FAF9FF;}
       <div id="reviewListHost"></div>
       <div id="noReviewMsg" class="hidden section-card" style="text-align:center;color:#9C99B8;font-weight:600;">No entries pending review 🎉</div>
     </div>
+
+    <!-- HIGH AGING MODULE (content next update me) -->
+    <div id="agingPage" class="hidden">
+      <div class="section-card aging-empty">
+        <div class="aging-ico">⏳</div>
+        <div class="aging-h">High Aging</div>
+        <div class="aging-sub">Is section ka process next update me add hoga.</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1316,8 +1530,13 @@ let newTTClockTimer = null, detailClockTimer = null, locClockTimer = null;
    On GitHub Pages the in-page LIVE CAMERA works (Apps Script blocks camera inside its frame). */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyNUyrTtZWtnl9spe1EndfXD61pxNVkWJ4o8rK0vaqfNtlk4y6j0B2Sd-fLPaz0TME/exec';   // e.g. https://script.google.com/macros/s/AKfy..../exec
 const IN_APPS_SCRIPT = !!(window.google && google.script && google.script.run);
+const UI_VERSION = 'UI-2026-10-08-h5';   // console me dikhega -> pata chale naya Index.html chal raha hai
+console.log('%c[RJ CM WO] ' + UI_VERSION, 'color:#1F5FE0;font-weight:bold');
 function callServer(fnName, arg){
   if(IN_APPS_SCRIPT){
+    if(typeof google.script.run[fnName] !== 'function'){
+      return Promise.reject(new Error('Server par "' + fnName + '" function nahi mila — Apps Script me naya Code.gs paste karke Save karein, phir Deploy → Manage deployments → Edit → New version.'));
+    }
     return new Promise((resolve, reject)=>{
       google.script.run
         .withSuccessHandler(resolve)
@@ -1328,7 +1547,7 @@ function callServer(fnName, arg){
     return Promise.reject(new Error('Index.html me API_URL (Apps Script /exec link) set karein.'));
   }
   // Reads / uploads are retried automatically (Google sometimes loses the reply: echo 404).
-  const RETRY = { getReferenceData:3, getTTData:3, prepareTTFolder:3, loginUser:2, uploadPhoto:3 };
+  const RETRY = { getReferenceData:3, getTTData:3, prepareTTFolder:3, loginUser:2, uploadPhoto:3, uploadDumpChunk:3 };
   const tries = RETRY[fnName] || 1;
   const once = ()=> fetch(API_URL, {
     method:'POST', redirect:'follow',
@@ -1347,7 +1566,9 @@ function callServer(fnName, arg){
         err.blocked = status === 0;
         throw err;
       }
-      if(j.__error) throw new Error(j.__error);
+      if(j.__error) throw new Error(/Unknown API function/.test(j.__error)
+        ? 'Server par "' + fnName + '" function nahi mila — Apps Script me naya Code.gs paste karke New version deploy karein.'
+        : j.__error);
       return j.result;
     });
   const run = (n)=> once().catch(err=>{
@@ -2112,7 +2333,7 @@ async function doLogin(){
           session = Object.assign({}, res.session, { _key:key },
             payload.mode==='FRT' ? { pprj:payload.pprj, cmp:payload.cmp, frt:payload.frt } : {});
           lsSet(LS.session, session);
-          document.getElementById('userChip').innerHTML = session.name + '<small>'+session.jobRole+'</small>';
+          setUserHeader_();
         }
       } else if(res && res.authFail){
         removeCred(key); removeSavedPw(key);          // password changed / user removed in Sheet
@@ -2192,7 +2413,7 @@ function doLogout(){
 /* ================= APP ENTRY / HOME ================= */
 function enterApp(){
   showScreen('app');
-  document.getElementById('userChip').innerHTML = session.name + '<small>'+session.jobRole+'</small>';
+  setUserHeader_();
   const isNOC = (session.role === 'NOC' || session.role === 'Admin');
   document.getElementById('addTTBtn').classList.toggle('hidden', !isNOC);
   // Review button visible to everyone; scope/rights differ by role (see myReviewEntries/canSubmitReview).
@@ -2220,6 +2441,9 @@ function applyRoleFilters(){
   }
 }
 function goHome(){
+  currentModule = 'cmwo';
+  document.getElementById('agingPage').classList.add('hidden');
+  setActiveTab_('cmwo');
   document.getElementById('homePage').classList.remove('hidden');
   document.getElementById('detailPage').classList.add('hidden');
   document.getElementById('locPage').classList.add('hidden');
@@ -2232,10 +2456,180 @@ function backToHome(){ goHome(); }
 
 /* ================= HEADER: PAGE TRACKING / BACK / RESET ================= */
 let currentPage = 'home';
-function setPage(p){
+let currentModule = 'cmwo';
+/* Home level -> main header + tabs.  Drill-down -> Home + Back + heading only. */
+function setPage(p, title){
   currentPage = p;
-  document.getElementById('headerBackBtn').classList.toggle('hidden', p==='home');
+  const drill = p !== 'home' && p !== 'review';   // Review = top-level tab page (main header stays)
+  document.getElementById('mainHeader').classList.toggle('hidden', drill);
+  document.getElementById('modTabs').classList.toggle('hidden', drill);
+  document.getElementById('drillHeader').classList.toggle('hidden', !drill);
+  if(drill){
+    document.getElementById('agingPage').classList.add('hidden');   // drill pages belong to CM WO
+    currentModule = 'cmwo'; setActiveTab_('cmwo');
+    document.getElementById('drillTitle').textContent = title || drillTitle_(p);
+  }
+  if(p === 'review'){
+    document.getElementById('agingPage').classList.add('hidden');
+    currentModule = 'cmwo'; setActiveTab_('review');
+  } else if(p === 'home'){
+    setActiveTab_(currentModule);
+  }
+  window.scrollTo(0, 0);
 }
+function drillTitle_(p){
+  const tt = (typeof currentDetailTT !== 'undefined' && currentDetailTT && currentDetailTT.ttNo) ? currentDetailTT.ttNo : '';
+  if(p === 'detail') return 'CM WO — TT Detail' + (tt ? ' · ' + tt : '');
+  if(p === 'loc') return 'CM WO — Go To Fault Location' + (tt ? ' · ' + tt : '');
+  if(p === 'review') return 'CM WO — Review Pending';
+  return 'CM WO';
+}
+function goHomeFromDrill(){
+  goHome();   // current drill-down pages all belong to CM WO
+}
+/* Module tabs: CM WO (current process) / High Aging (next update) */
+function setActiveTab_(m){
+  document.getElementById('tabCMWO').classList.toggle('active', m === 'cmwo');
+  document.getElementById('tabAging').classList.toggle('active', m === 'aging');
+  document.getElementById('reviewPendingBtn').classList.toggle('active', m === 'review');
+}
+function switchModule(m){
+  if(m === 'cmwo'){ goHome(); return; }
+  currentModule = 'aging';
+  ['homePage','detailPage','locPage','reviewListPage'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  stopAllClocks();
+  document.getElementById('agingPage').classList.remove('hidden');
+  setActiveTab_('aging');
+  setPage('home');
+}
+/* Header user block (left side) */
+function setUserHeader_(){
+  if(!session) return;
+  const name = session.name || session.frt || 'User';
+  document.getElementById('hdrAvatar').textContent = name.trim().charAt(0).toUpperCase() || 'U';
+  document.getElementById('hdrName').textContent = name;
+  document.getElementById('hdrRole').textContent = session.jobRole || session.role || '';
+  document.getElementById('hdrScope').textContent = (session.role === 'FRT' && session.cmp) ? session.cmp : 'All';
+  // Attach / Upload / Run — only Admin & NOC
+  const canDump = (session.role === 'Admin' || session.role === 'NOC');
+  document.querySelectorAll('.dump-only').forEach(el => el.classList.toggle('role-hidden', !canDump));
+}
+/* Header buttons — functions will be added in next update */
+function hdrComingSoon_(label){ toast(label + ' — is button ka function next update me add hoga.', 'ok'); }
+/* ===== Resolved TT Dump: Attach (1 CSV/Excel) -> Upload (Drive folder) -> Run (Rajasthan -> "Resolved TT" sheet) ===== */
+let dumpFile = null, dumpUploaded = false, dumpBusy = false;
+function hdrAttach(){
+  const inp = document.getElementById('dumpFileInput');
+  inp.value = '';                      // same file dobara select karne par bhi change event aaye
+  inp.click();
+}
+/** "Resolved-tt-dump_07_Oct_2026__17_40.csv" -> "Resolved-tt-dump_07_Oct…" (button size same rehta hai, CSS ellipsis) */
+function onDumpFilePicked(e){
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  if(!/\.(csv|xlsx|xls|xlsm)$/i.test(f.name)){ toast('Sirf CSV ya Excel file select karein.', 'err'); return; }
+  clearTimeout(window.__dumpResetT);
+  dumpFile = f; dumpUploaded = false;
+  resetUploadBtn_();
+  const btn = document.getElementById('hdrAttachBtn');
+  document.getElementById('hdrAttachTxt').textContent = f.name.replace(/\.(csv|xlsx|xls|xlsm)$/i, '').replace(/[_\-]+/g, ' ').trim();
+  btn.classList.add('has-file');
+  btn.title = f.name + ' (' + Math.ceil(f.size / 1024) + ' KB)';
+  toast('File attached: ' + f.name, 'ok');
+}
+function resetAttachBtn_(){
+  dumpFile = null;
+  const btn = document.getElementById('hdrAttachBtn');
+  btn.classList.remove('has-file');
+  btn.title = '';
+  document.getElementById('hdrAttachTxt').textContent = 'Attach File';
+  document.getElementById('dumpFileInput').value = '';
+}
+function readFileDataUrl_(file){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = () => rej(new Error('File read nahi hui.'));
+    r.readAsDataURL(file);
+  });
+}
+/* Upload ring: % = pieces confirmed by server; 100% -> green tick */
+function setUploadRing_(pct){
+  const btn = document.getElementById('hdrUploadBtn');
+  pct = Math.max(0, Math.min(100, Math.round(pct)));
+  btn.classList.remove('done'); btn.classList.add('uploading');
+  document.getElementById('upRingFg').style.strokeDashoffset = (106.8 * (1 - pct / 100)).toFixed(1);
+  document.getElementById('upPct').textContent = pct + '%';
+}
+function resetUploadBtn_(){
+  const btn = document.getElementById('hdrUploadBtn');
+  btn.classList.remove('uploading', 'done', 'busy');
+  document.getElementById('upRingFg').style.strokeDashoffset = '106.8';
+  document.getElementById('upPct').textContent = '0%';
+  btn.title = 'Upload to Drive';
+}
+async function hdrUpload(){
+  if(dumpBusy) return;
+  if(!session || !(session.role === 'Admin' || session.role === 'NOC')) return;
+  if(!dumpFile){ toast('Pehle Attach File se CSV / Excel file select karein.', 'err'); return; }
+  const btn = document.getElementById('hdrUploadBtn');
+  dumpBusy = true;
+  setUploadRing_(0);
+  try{
+    const dataUrl = await readFileDataUrl_(dumpFile);
+    const m = dataUrl.match(/^data:(.*?);base64,(.*)$/);
+    if(!m) throw new Error('File read nahi hui.');
+    const mime = (m[1] || '').split(';')[0], b64 = m[2];
+    const CHUNK = 90000, total = Math.max(1, Math.ceil(b64.length / CHUNK));
+    const uploadId = 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    let done = 0, next = 0;
+    setUploadRing_(2);
+    // send pieces 4 at a time; ring moves as each piece is confirmed (last 5% = saving in Drive)
+    const worker = async ()=>{
+      while(next < total){
+        const i = next++;
+        const r = await callServer('uploadDumpChunk', { uploadId, index: i, data: b64.slice(i * CHUNK, (i + 1) * CHUNK) });
+        if(!r || !r.ok) throw new Error((r && r.error) || 'Upload beech me ruk gaya.');
+        done++;
+        setUploadRing_(2 + 93 * done / total);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(4, total) }, worker));
+    const res = await callServer('uploadDumpFinish', { uploadId, total, fileName: dumpFile.name, mime });
+    if(!res || !res.ok) throw new Error((res && res.error) || 'Drive me save nahi hua.');
+    setUploadRing_(100);
+    await new Promise(r => setTimeout(r, 250));
+    btn.classList.remove('uploading'); btn.classList.add('done');
+    dumpUploaded = true;
+    toast('Drive folder me upload ho gayi ✔ ' + res.name, 'ok');
+    // ✓ sirf 5 second -> phir Attach (file name hata kar) aur Upload (⬆ icon) dono normal
+    clearTimeout(window.__dumpResetT);
+    window.__dumpResetT = setTimeout(()=>{ resetAttachBtn_(); resetUploadBtn_(); }, 5000);
+  }catch(err){
+    resetUploadBtn_();
+    toast('Upload nahi hua: ' + err.message, 'err');
+  }finally{
+    dumpBusy = false;
+  }
+}
+async function hdrRun(){
+  if(dumpBusy) return;
+  if(!session || !(session.role === 'Admin' || session.role === 'NOC')) return;
+  const btn = document.getElementById('hdrRunBtn');
+  dumpBusy = true; btn.classList.add('running'); btn.title = 'Running…';
+  try{
+    const res = await callServer('runResolvedTTDump', {});
+    if(!res || !res.ok) throw new Error((res && res.error) || 'Run fail.');
+    toast('Resolved TT Dump Updated', 'ok');
+    console.log('[Run] ' + res.file + ' -> ' + res.rows + ' Rajasthan rows');
+  }catch(err){
+    toast('Run nahi hua: ' + err.message, 'err');
+  }finally{
+    dumpBusy = false; btn.classList.remove('running'); btn.title = '';
+  }
+}
+function hdrSummary(){ hdrComingSoon_('Summary'); }
+function hdrSearch(){ hdrComingSoon_('Search'); }
 function headerBack(){
   if(currentPage === 'detail') goHome();
   else if(currentPage === 'loc') backToDetailFromLoc();
@@ -2270,7 +2664,7 @@ async function headerResetSync(){
             payload.mode==='FRT' ? { pprj:payload.pprj, cmp:payload.cmp, frt:payload.frt } : {});
           lsSet(LS.session, session);
           saveCred(key, await hashPw(key, pw), res.session);
-          document.getElementById('userChip').innerHTML = session.name + '<small>'+session.jobRole+'</small>';
+          setUserHeader_();
           const isNOC = (session.role === 'NOC' || session.role === 'Admin');
           document.getElementById('addTTBtn').classList.toggle('hidden', !isNOC);
           applyRoleFilters();
