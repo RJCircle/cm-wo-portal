@@ -212,6 +212,7 @@ input,select,textarea{font-family:inherit;}
 .sync-dot.ok{background:#22C55E;}
 .sync-dot.busy{background:#F59E0B;}
 .sync-dot.err{background:#EF4444;}
+.sync-dot.offline{background:#94A3B8;}
 .header-reset-btn.spinning span{display:inline-block;animation:rjspin .8s linear infinite;}
 @keyframes rjspin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .remember-row{display:flex;align-items:center;gap:8px;margin:-4px 0 14px;font-size:.82rem;font-weight:700;color:#3A3660;cursor:pointer;}
@@ -596,6 +597,11 @@ table.data-table tr:hover td{background:#FAF9FF;}
 .cap-group{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
 .video-thumb{position:relative;width:220px;max-width:100%;border-radius:12px;overflow:hidden;background:#000;border:1px solid var(--line);}
 .video-thumb video, .video-thumb iframe{width:100%;height:150px;display:block;border:0;background:#000;}
+.vposter{position:relative;width:100%;background:#0F172A;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.vposter img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.75;}
+.vposter .vplay{position:relative;width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,.92);color:#1D4ED8;font-size:1.5rem;
+  display:flex;align-items:center;justify-content:center;padding-left:4px;box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .15s ease;}
+.vposter:hover .vplay{transform:scale(1.08);}
 .video-thumb .meta{font-size:.72rem;padding:6px 8px;background:#FBFAFF;color:#4B4770;}
 .video-thumb .rm{position:absolute;top:6px;right:6px;}
 /* ---- CBUD snap: button right under its label ---- */
@@ -1574,9 +1580,15 @@ let newTTClockTimer = null, detailClockTimer = null, locClockTimer = null;
    On GitHub Pages the in-page LIVE CAMERA works (Apps Script blocks camera inside its frame). */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyNUyrTtZWtnl9spe1EndfXD61pxNVkWJ4o8rK0vaqfNtlk4y6j0B2Sd-fLPaz0TME/exec';   // e.g. https://script.google.com/macros/s/AKfy..../exec
 const IN_APPS_SCRIPT = !!(window.google && google.script && google.script.run);
-const UI_VERSION = 'UI-2026-10-08-h7';   // console me dikhega -> pata chale naya Index.html chal raha hai
+const UI_VERSION = 'UI-2026-10-08-h9';   // console me dikhega -> pata chale naya Index.html chal raha hai
 console.log('%c[RJ CM WO] ' + UI_VERSION, 'color:#1F5FE0;font-weight:bold');
+function isOffline_(){ return typeof navigator !== 'undefined' && navigator.onLine === false; }
 function callServer(fnName, arg){
+  if(isOffline_()){
+    const e = new Error('Internet connection nahi hai — net aate hi apne aap sync ho jayega.');
+    e.offline = true;
+    return Promise.reject(e);
+  }
   if(IN_APPS_SCRIPT){
     if(typeof google.script.run[fnName] !== 'function'){
       return Promise.reject(new Error('Server par "' + fnName + '" function nahi mila — Apps Script me naya Code.gs paste karke Save karein, phir Deploy → Manage deployments → Edit → New version.'));
@@ -1616,7 +1628,7 @@ function callServer(fnName, arg){
     });
   const run = (n)=> once().catch(err=>{
     if(err.retryable && n > 1) return new Promise(r=> setTimeout(r, 1200)).then(()=> run(n - 1));
-    console.warn('[API] ' + fnName + ' fail: ' + err.message);     // only after all retries
+    if(!isOffline_()) console.warn('[API] ' + fnName + ' fail: ' + err.message);     // only after all retries, not when offline
     throw err;
   });
   return run(tries);
@@ -1931,7 +1943,7 @@ function loadTTData(force){
     ttSig = sig;
     refreshAfterTTLoad_(changed);
     return true;
-  }).catch(err=>{ console.warn(err); return false; })
+  }).catch(err=>{ return false; })               // reason already logged once by callServer
     .finally(()=>{ ttLoading = null; });
   return ttLoading;
 }
@@ -1968,6 +1980,7 @@ let syncFails = 0, syncNextAt = 0, syncWarned = false;
 async function backgroundSync_(manual){
   if(syncBusy30) return;                               // runs every 30 sec (also on Fault Location page / background tab)
   if(!manual && Date.now() < syncNextAt) return;       // back-off after failures: 1, 2, 4 ... max 5 min
+  if(isOffline_()){ setSyncState_('offline'); return; } // no internet -> don't even try (no console errors); resumes on 'online'
   syncBusy30 = true;
   setSyncState_('busy');
   let ok = true;
@@ -1982,6 +1995,7 @@ async function backgroundSync_(manual){
   finally{
     syncBusy30 = false;
     if(ok){ lastSyncAt = Date.now(); syncFails = 0; syncNextAt = 0; }
+    else if(isOffline_()){ /* net gaya beech me -> 'online' event par turant sync */ }
     else{
       syncFails++;
       syncNextAt = Date.now() + Math.min(5 * 60 * 1000, 30000 * Math.pow(2, syncFails));
@@ -1990,15 +2004,26 @@ async function backgroundSync_(manual){
         toast('Server se sync nahi ho pa raha — data cache se dikh raha hai. Apps Script deployment check karein: ' + API_URL + '?api=ping', 'err');
       }
     }
-    setSyncState_(ok ? 'ok' : 'err');
+    setSyncState_(ok ? 'ok' : (isOffline_() ? 'offline' : 'err'));
   }
 }
+/* Net gaya / wapas aaya -> cache se kaam chalta rahe, net aate hi turant sync */
+let offlineToastShown = false;
+window.addEventListener('offline', ()=>{
+  setSyncState_('offline');
+  if(!offlineToastShown){ offlineToastShown = true; toast('Internet nahi hai — data cache se dikh raha hai. Net aate hi apne aap sync hoga.', 'err'); }
+});
+window.addEventListener('online', ()=>{
+  offlineToastShown = false; syncNextAt = 0; syncFails = 0;
+  toast('Internet wapas aa gaya — sync ho raha hai…', 'ok');
+  setTimeout(()=> backgroundSync_(true), 800);
+});
 function setSyncState_(state){
   const dot = document.getElementById('syncDot'), btn = document.getElementById('headerResetBtn');
   if(!dot) return;
   dot.className = 'sync-dot ' + state;
   const t = lastSyncAt ? new Date(lastSyncAt).toLocaleTimeString() : '—';
-  btn.title = 'Reset & Sync  |  Auto-sync every 30 sec  |  Last sync: ' + t + (state === 'err' ? '  (last try failed)' : '');
+  btn.title = 'Reset & Sync  |  Auto-sync every 30 sec  |  Last sync: ' + t + (state === 'err' ? '  (last try failed)' : state === 'offline' ? '  (no internet)' : '');
 }
 
 /* Upload every captured photo (data:...) to Drive — 4 photos in PARALLEL (fast).
@@ -3716,11 +3741,27 @@ function renderVideoStrips_(){
     let player = '';
     if(v.status === 'processing') player = `<video controls playsinline></video>`;
     else if(local && local.blobUrl) player = `<video src="${local.blobUrl}" controls playsinline></video>`;
-    else if(v.full) player = `<iframe src="https://drive.google.com/file/d/${driveFileId_(v.full)}/preview" allow="autoplay" allowfullscreen></iframe>`;
+    else if(v.full) player = drivePoster_(driveFileId_(v.full), 150);
     host.innerHTML = `<div class="video-thumb">${player}
       <div class="meta">🎥 ${k === 'preVideo' ? 'Pre' : 'Post'} Video ${v.secs ? '('+v.secs+'s)' : ''} · ${v.tsLabel||''}<br><span class="vstat">${status}</span></div>
       <button class="rm" onclick="removeVideo('${k}')">✕</button></div>`;
   });
+}
+/* Drive video: thumbnail + ▶ first. Drive player (iframe) loads ONLY on click
+   -> page open hone par Drive player ki console warnings / errors nahi aati, aur page fast khulta hai. */
+function drivePoster_(id, h){
+  if(!id) return '';
+  return `<div class="vposter" style="height:${h}px" onclick="playDriveVideo_(this,'${escHtml_(id)}',${h})" title="Play video">
+    <img src="https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w640" referrerpolicy="no-referrer" alt="" onerror="this.remove()">
+    <span class="vplay">▶</span></div>`;
+}
+function playDriveVideo_(el, id, h){
+  const f = document.createElement('iframe');
+  f.src = 'https://drive.google.com/file/d/' + encodeURIComponent(id) + '/preview';
+  f.style.height = h + 'px';
+  f.setAttribute('allow', 'autoplay; fullscreen');
+  f.setAttribute('allowfullscreen', '');
+  el.replaceWith(f);
 }
 function removeVideo(k){
   draft[k] = null;
@@ -4101,7 +4142,7 @@ function openReviewDetail(id){
     return `<div class="photo-block"><div class="photo-block-head"><span class="lbl">${title}</span>
         <a class="cap-btn" style="display:inline-flex;text-decoration:none;" href="${v.full}" target="_blank" rel="noopener">↗ Open in Drive</a></div>
       <div class="video-thumb" style="width:100%;max-width:520px;">
-        <iframe src="https://drive.google.com/file/d/${id}/preview" style="height:290px;" allow="autoplay" allowfullscreen></iframe>
+        ${drivePoster_(id, 290)}
       </div></div>`;
   }
   const body = document.getElementById('reviewDetailBody');
