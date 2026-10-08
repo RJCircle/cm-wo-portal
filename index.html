@@ -1580,11 +1580,17 @@ let newTTClockTimer = null, detailClockTimer = null, locClockTimer = null;
    On GitHub Pages the in-page LIVE CAMERA works (Apps Script blocks camera inside its frame). */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyNUyrTtZWtnl9spe1EndfXD61pxNVkWJ4o8rK0vaqfNtlk4y6j0B2Sd-fLPaz0TME/exec';   // e.g. https://script.google.com/macros/s/AKfy..../exec
 const IN_APPS_SCRIPT = !!(window.google && google.script && google.script.run);
-const UI_VERSION = 'UI-2026-10-08-h10';   // console me dikhega -> pata chale naya Index.html chal raha hai
+const UI_VERSION = 'UI-2026-10-08-h11';   // console me dikhega -> pata chale naya Index.html chal raha hai
 console.log('%c[RJ CM WO] ' + UI_VERSION, 'color:#1F5FE0;font-weight:bold');
 function isOffline_(){ return typeof navigator !== 'undefined' && navigator.onLine === false; }
-/* Backup READ channel: JSONP (<script> tag) -> CORS lagta hi nahi. POST block ho jaye tab bhi data aa jata hai. */
-const JSONP_FNS = { getReferenceData:1, getTTData:1, getHighAging:1, getDatabaseTT:1 };
+/* Backup channel: JSONP (<script> tag) -> CORS lagta hi nahi.
+   - SAFE_RETRY fns: POST block hote hi turant backup se dobara (inhe 2 baar chalana safe hai).
+   - POST ek baar block hua -> agle 10 min SAB chhoti calls seedha backup se (POST try hi nahi -> console me laal errors nahi).
+     Bade uploads (photo / file chunks) hamesha POST se jaate hain. */
+const SAFE_RETRY = { getReferenceData:1, getTTData:1, getHighAging:1, getDatabaseTT:1, loginUser:1, prepareTTFolder:1, runResolvedTTDump:1 };
+const JSONP_MAX_ARG = 6000;                  // URL me itna hi data safe hai
+let postBlockedUntil = 0;
+function jsonpFits_(arg){ try{ return encodeURIComponent(JSON.stringify(arg === undefined ? null : arg)).length <= JSONP_MAX_ARG; }catch(e){ return false; } }
 let jsonpSeq = 0;
 function jsonpCall_(fnName, arg){
   return new Promise((resolve, reject)=>{
@@ -1622,6 +1628,12 @@ function callServer(fnName, arg){
   if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(API_URL)){
     return Promise.reject(new Error('Index.html me API_URL (Apps Script /exec link) set karein.'));
   }
+  if(Date.now() < postBlockedUntil && jsonpFits_(arg)){
+    return jsonpCall_(fnName, arg).catch(e=>{
+      if(/connect nahi ho paya \(backup/.test(e.message)) postBlockedUntil = 0;   // backup bhi band -> agli baar POST try karo
+      throw e;
+    });
+  }
   // Reads / uploads are retried automatically (Google sometimes loses the reply: echo 404).
   const RETRY = { getReferenceData:3, getTTData:3, prepareTTFolder:3, loginUser:2, uploadPhoto:3, uploadDumpChunk:3 };
   const tries = RETRY[fnName] || 1;
@@ -1649,7 +1661,8 @@ function callServer(fnName, arg){
   const run = (n)=> once().catch(err=>{
     if(err.retryable && n > 1) return new Promise(r=> setTimeout(r, 1200)).then(()=> run(n - 1));
     // POST blocked (CORS / HTTP 0) -> same read via JSONP backup channel
-    if(err.blocked && JSONP_FNS[fnName] && !isOffline_()){
+    if(err.blocked && !isOffline_()) postBlockedUntil = Date.now() + 10 * 60 * 1000;
+    if(err.blocked && SAFE_RETRY[fnName] && jsonpFits_(arg) && !isOffline_()){
       return jsonpCall_(fnName, arg).catch(e2=>{
         if(!isOffline_()) console.warn('[API] ' + fnName + ' fail (POST + backup): ' + e2.message);
         throw err;
