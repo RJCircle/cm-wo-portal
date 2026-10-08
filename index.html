@@ -385,20 +385,36 @@ input,select,textarea{font-family:inherit;}
 .aging-h{font-family:'Oswald',sans-serif;font-size:1.4rem;font-weight:700;margin-top:8px;color:var(--ink);}
 .aging-sub{color:var(--ink-soft);font-weight:600;margin-top:6px;}
 
-/* ---- Smaller screens: still TWO lines.
-   Line 1 = user (left) + Attach / Upload / Run / Logout (right)
-   Line 2 = Summary (left) + title (centre) + Search / Reset (right) ---- */
+/* ---- Laptop / tablet (761-1240px): still TWO lines, title in the CENTRE of both lines (vertical + horizontal)
+   Line 1 = user (left) ........ Attach / Upload / Run / Logout (right)
+   Line 2 = Summary (left) ..... Search / Reset (right)          title spans both lines in the middle ---- */
 @media (max-width:1240px){
-  .hdr{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-rows:auto auto;row-gap:10px;}   /* equal sides -> title exactly centre */
-  .hdr-user{grid-column:1;grid-row:1;min-width:0;}
-  .hdr-row1{grid-column:2 / 4;grid-row:1;flex-wrap:nowrap;}
-  .hdr-left2{grid-column:1;grid-row:2;}
-  .hdr-title{grid-column:2;grid-row:2;min-width:0;}
+  .hdr{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-rows:auto auto;row-gap:10px;}
+  .hdr-user{grid-column:1;grid-row:1;min-width:0;overflow:hidden;}
+  .hdr-left2{grid-column:1;grid-row:2;justify-self:start;}
+  .hdr-title{grid-column:2;grid-row:1 / span 2;align-self:center;min-width:0;}
+  .hdr-row1{grid-column:3;grid-row:1;flex-wrap:nowrap;justify-self:end;}
   .hdr-row2{grid-column:3;grid-row:2;flex-wrap:nowrap;justify-self:end;}
-  .hdr-left2{justify-self:start;}
-  .hdr-user{overflow:hidden;}
   .hdr-tags{flex-wrap:nowrap;}
   .hdr-tagline{display:none;}
+}
+/* 761-1099px: same layout, buttons a little smaller so everything fits on its line */
+@media (min-width:761px) and (max-width:1099px){
+  .hdr{padding:12px 14px;column-gap:10px;}
+  .hdr-row1,.hdr-row2{gap:7px;}
+  .hdr-title-main{font-size:1.3rem;}
+  .hb-icon{width:34px;height:34px;}
+  .hb-icon svg{width:16px;height:16px;}
+  .hb-attach{padding:7px 11px;font-size:.78rem;width:118px;}
+  .hb-pill{padding:8px 14px;font-size:.82rem;}
+  #hdrRunBtn{width:62px;}
+  .hdr-name{max-width:150px;}
+}
+/* <=860px (phone / small tablet): no room for a 2-row-tall title next to the line-1 buttons
+   -> title sits in line 2, centred between Summary and Search/Reset (still only 2 lines) */
+@media (max-width:860px){
+  .hdr-row1{grid-column:2 / 4;}
+  .hdr-title{grid-row:2;}
 }
 /* ---- Mobile: same 2-line structure, compact sizes ---- */
 @media (max-width:760px){
@@ -1580,7 +1596,7 @@ let newTTClockTimer = null, detailClockTimer = null, locClockTimer = null;
    On GitHub Pages the in-page LIVE CAMERA works (Apps Script blocks camera inside its frame). */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyNUyrTtZWtnl9spe1EndfXD61pxNVkWJ4o8rK0vaqfNtlk4y6j0B2Sd-fLPaz0TME/exec';   // e.g. https://script.google.com/macros/s/AKfy..../exec
 const IN_APPS_SCRIPT = !!(window.google && google.script && google.script.run);
-const UI_VERSION = 'UI-2026-10-08-h11';   // console me dikhega -> pata chale naya Index.html chal raha hai
+const UI_VERSION = 'UI-2026-10-08-h12';   // console me dikhega -> pata chale naya Index.html chal raha hai
 console.log('%c[RJ CM WO] ' + UI_VERSION, 'color:#1F5FE0;font-weight:bold');
 function isOffline_(){ return typeof navigator !== 'undefined' && navigator.onLine === false; }
 /* Backup channel: JSONP (<script> tag) -> CORS lagta hi nahi.
